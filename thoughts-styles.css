@@ -1,0 +1,38 @@
+/* Additional styles for thoughts/articles section */
+
+.thought-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.thought-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.full-article {
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+          opacity: 0;
+          transform: translateY(-10px);
+    }
+    to {
+          opacity: 1;
+          transform: translateY(0);
+    }
+}
+
+.article-content-1,
+.article-content-2,
+.article-content-3 {
+    line-height: 1.8;
+    color: #555;
+}
+
+.article-content-1 p,
+.article-content-2 p,
+.article-content-3 p {
+    margin-bottom: 15px;
+}
