@@ -86,6 +86,7 @@ const STYLES = `
     width: 100%;
     line-height: 0;
     background: #4c7a30;
+    overflow: hidden;
 }
 .ps-canvas {
     display: block;
@@ -255,6 +256,7 @@ export default function initPlasticSoldiersGame(root) {
     }
 
     let player, enemy, selected, dragBox, gameOver, lastTs, rafId, aiTimer;
+    let particles, decals, corpses, projectiles, screenShake;
 
     function makeBase(team, x, y) {
         const size = 84;
@@ -328,6 +330,11 @@ export default function initPlasticSoldiersGame(root) {
         dragBox = null;
         gameOver = false;
         aiTimer = 3;
+        particles = [];
+        decals = [];
+        corpses = [];
+        projectiles = [];
+        screenShake = { ttl: 0, mag: 0 };
         overlayEl.hidden = true;
         statusEl.textContent = '';
     }
@@ -357,19 +364,282 @@ export default function initPlasticSoldiersGame(root) {
         return !!entity && entity.alive;
     }
 
-    function dealDamage(attacker, target) {
+    // --- Visual effects: particles, blood/scorch decals, corpses, screen shake ---
+
+    function triggerShake(mag, dur) {
+        if (mag >= screenShake.mag) screenShake.mag = mag;
+        screenShake.ttl = Math.max(screenShake.ttl, dur);
+    }
+
+    function spawnParticle(p) {
+        particles.push(Object.assign({ vx: 0, vy: 0, drag: 0, gravity: 0, rot: 0, vrot: 0, growth: 0 }, p));
+    }
+
+    function spawnBloodBurst(x, y, count) {
+        for (let i = 0; i < count; i++) {
+            const a = Math.random() * Math.PI * 2;
+            const speed = 30 + Math.random() * 90;
+            spawnParticle({
+                type: 'blood',
+                x,
+                y,
+                vx: Math.cos(a) * speed,
+                vy: Math.sin(a) * speed,
+                drag: 3,
+                gravity: 50,
+                size: 1.4 + Math.random() * 2.4,
+                life: 0.35 + Math.random() * 0.4,
+                maxLife: 0.75,
+                color: Math.random() > 0.3 ? '#8c1c1c' : '#c22b2b',
+            });
+        }
+    }
+
+    function addDecal(kind, x, y) {
+        decals.push({
+            kind,
+            x: x + (Math.random() - 0.5) * 6,
+            y: y + (Math.random() - 0.5) * 6,
+            r: kind === 'scorch' ? 13 + Math.random() * 9 : 5 + Math.random() * 6,
+            rot: Math.random() * Math.PI * 2,
+            alpha: kind === 'scorch' ? 0.55 : 0.7,
+        });
+        if (decals.length > 160) decals.shift();
+    }
+
+    function spawnDebris(x, y, colorDark, colorBody, count) {
+        for (let i = 0; i < count; i++) {
+            const a = Math.random() * Math.PI * 2;
+            const speed = 30 + Math.random() * 70;
+            spawnParticle({
+                type: 'debris',
+                x,
+                y,
+                vx: Math.cos(a) * speed,
+                vy: Math.sin(a) * speed,
+                drag: 2.5,
+                gravity: 40,
+                size: 2 + Math.random() * 2.5,
+                rot: Math.random() * Math.PI * 2,
+                vrot: (Math.random() - 0.5) * 10,
+                life: 0.6 + Math.random() * 0.5,
+                maxLife: 1.1,
+                color: Math.random() > 0.5 ? colorDark : colorBody,
+            });
+        }
+    }
+
+    function spawnSmoke(x, y, count) {
+        for (let i = 0; i < count; i++) {
+            spawnParticle({
+                type: 'smoke',
+                x: x + (Math.random() - 0.5) * 8,
+                y: y + (Math.random() - 0.5) * 8,
+                vx: (Math.random() - 0.5) * 18,
+                vy: -14 - Math.random() * 18,
+                drag: 1.2,
+                gravity: -4,
+                size: 5 + Math.random() * 6,
+                growth: 8 + Math.random() * 6,
+                life: 0.6 + Math.random() * 0.6,
+                maxLife: 1.2,
+            });
+        }
+    }
+
+    function spawnSparks(x, y, angle, count) {
+        for (let i = 0; i < count; i++) {
+            const a = angle + (Math.random() - 0.5) * 0.8;
+            const speed = 90 + Math.random() * 110;
+            spawnParticle({
+                type: 'spark',
+                x,
+                y,
+                vx: Math.cos(a) * speed,
+                vy: Math.sin(a) * speed,
+                drag: 5,
+                gravity: 20,
+                life: 0.07 + Math.random() * 0.08,
+                maxLife: 0.15,
+                color: '#ffe066',
+            });
+        }
+    }
+
+    function spawnSparksOmni(x, y, count) {
+        for (let i = 0; i < count; i++) {
+            spawnSparks(x, y, Math.random() * Math.PI * 2, 1);
+        }
+    }
+
+    function spawnDamageText(x, y, amount) {
+        spawnParticle({
+            type: 'text',
+            x,
+            y: y - 14,
+            vx: (Math.random() - 0.5) * 6,
+            vy: -26,
+            life: 0.7,
+            maxLife: 0.7,
+            text: '-' + amount,
+            color: '#fff5cc',
+        });
+    }
+
+    function explode(x, y, big) {
+        spawnParticle({
+            type: 'shock',
+            x,
+            y,
+            size: big ? 6 : 3,
+            growth: big ? 260 : 160,
+            life: 0.28,
+            maxLife: 0.28,
+            color: '#ffcf6b',
+        });
+        spawnSmoke(x, y, big ? 9 : 5);
+        spawnSparksOmni(x, y, big ? 16 : 8);
+        spawnDebris(x, y, '#3a3a3a', '#6b6b6b', big ? 8 : 4);
+        addDecal('scorch', x, y);
+        triggerShake(big ? 9 : 4, big ? 0.35 : 0.16);
+    }
+
+    function killUnit(u) {
+        const colors = TEAM_COLORS[u.team];
+        corpses.push({
+            x: u.x,
+            y: u.y,
+            team: u.team,
+            angle: Math.random() * Math.PI * 2,
+            ttl: 5,
+        });
+        spawnBloodBurst(u.x, u.y, 12);
+        spawnDebris(u.x, u.y, colors.dark, colors.body, 5);
+        addDecal('blood', u.x, u.y);
+    }
+
+    function applyDamage(attacker, target, opts = {}) {
+        if (!target.alive) return;
+        const amount = Math.min(target.hp, Math.round(attacker.dmg));
         target.hp = Math.max(0, target.hp - attacker.dmg);
         target.hitFlash = 0.15;
-        attacker.tracer = { x1: attacker.x, y1: attacker.y, x2: target.x, y2: target.y, ttl: 0.08 };
+        if (amount > 0) spawnDamageText(target.x, target.y, amount);
+        spawnBloodBurst(target.x, target.y, target.isBase ? 0 : 3);
+
+        if (!opts.skipTracer) {
+            attacker.tracer = { x1: attacker.x, y1: attacker.y, x2: target.x, y2: target.y, ttl: 0.08 };
+            const ang = Math.atan2(target.y - attacker.y, target.x - attacker.x);
+            const originR = attacker.radius || (attacker.w ? attacker.w / 2 : 10);
+            spawnSparks(attacker.x + Math.cos(ang) * originR, attacker.y + Math.sin(ang) * originR, ang, 3);
+        }
+
         if (target.hp <= 0) {
             target.alive = false;
             if (target.isBase) {
+                explode(target.x, target.y, true);
+                explode(target.x + (Math.random() - 0.5) * 34, target.y + (Math.random() - 0.5) * 34, true);
+                triggerShake(14, 0.6);
                 gameOver = true;
                 statusEl.textContent = target.team === 'player' ? 'Defeat! Your toy box was overrun.' : 'Victory! The enemy base is scattered!';
                 overlayTitleEl.textContent = target.team === 'player' ? 'Defeat' : 'Victory!';
                 overlayEl.hidden = false;
+            } else {
+                killUnit(target);
             }
         }
+    }
+
+    function fireAt(attacker, target) {
+        if (attacker.type === 'bazooka') {
+            const ang = Math.atan2(target.y - attacker.y, target.x - attacker.x);
+            spawnSparks(attacker.x + Math.cos(ang) * (attacker.radius + 8), attacker.y + Math.sin(ang) * (attacker.radius + 8), ang, 4);
+            projectiles.push({
+                x: attacker.x,
+                y: attacker.y,
+                tx: target.x,
+                ty: target.y,
+                primaryTarget: target,
+                team: attacker.team,
+                dmg: attacker.dmg,
+                speed: 260,
+                smokeTimer: 0,
+                hit: false,
+            });
+        } else {
+            applyDamage(attacker, target);
+        }
+    }
+
+    function resolveProjectileImpact(pr) {
+        const enemySide = pr.team === 'player' ? enemy : player;
+        explode(pr.x, pr.y, true);
+
+        if (pr.primaryTarget && isAlive(pr.primaryTarget)) {
+            applyDamage({ dmg: pr.dmg, x: pr.x, y: pr.y, team: pr.team }, pr.primaryTarget, { skipTracer: true });
+        }
+        for (const u of enemySide.units) {
+            if (!u.alive || u === pr.primaryTarget) continue;
+            if (dist(u, pr) <= 32) {
+                applyDamage({ dmg: Math.round(pr.dmg * 0.5), x: pr.x, y: pr.y, team: pr.team }, u, { skipTracer: true });
+            }
+        }
+        if (enemySide.base.alive && enemySide.base !== pr.primaryTarget && dist(enemySide.base, pr) <= 50) {
+            applyDamage({ dmg: Math.round(pr.dmg * 0.5), x: pr.x, y: pr.y, team: pr.team }, enemySide.base, { skipTracer: true });
+        }
+    }
+
+    function updateProjectiles(dt) {
+        for (const pr of projectiles) {
+            if (pr.hit) continue;
+            pr.smokeTimer -= dt;
+            if (pr.smokeTimer <= 0) {
+                spawnSmoke(pr.x, pr.y, 1);
+                pr.smokeTimer = 0.035;
+            }
+            if (pr.primaryTarget && isAlive(pr.primaryTarget)) {
+                pr.tx = pr.primaryTarget.x;
+                pr.ty = pr.primaryTarget.y;
+            }
+            const dx = pr.tx - pr.x;
+            const dy = pr.ty - pr.y;
+            const d = Math.hypot(dx, dy);
+            const step = pr.speed * dt;
+            if (d <= step || d < 6) {
+                pr.x = pr.tx;
+                pr.y = pr.ty;
+                pr.hit = true;
+                resolveProjectileImpact(pr);
+            } else {
+                pr.x += (dx / d) * step;
+                pr.y += (dy / d) * step;
+            }
+        }
+        projectiles = projectiles.filter((pr) => !pr.hit);
+    }
+
+    function updateEffects(dt) {
+        for (const p of particles) {
+            p.life -= dt;
+            const damp = Math.min(1, p.drag * dt);
+            p.vx *= 1 - damp;
+            p.vy += p.gravity * dt;
+            p.vy *= 1 - damp;
+            p.x += p.vx * dt;
+            p.y += p.vy * dt;
+            p.rot += p.vrot * dt;
+            p.size = (p.size || 0) + p.growth * dt;
+        }
+        particles = particles.filter((p) => p.life > 0);
+        if (particles.length > 420) particles.splice(0, particles.length - 420);
+
+        for (const d of decals) d.alpha -= dt * 0.006;
+        decals = decals.filter((d) => d.alpha > 0.03);
+
+        for (const c of corpses) c.ttl -= dt;
+        corpses = corpses.filter((c) => c.ttl > 0);
+
+        screenShake.ttl = Math.max(0, screenShake.ttl - dt);
+        if (screenShake.ttl === 0) screenShake.mag = 0;
     }
 
     function moveToward(u, target, dt) {
@@ -401,7 +671,7 @@ export default function initPlasticSoldiersGame(root) {
             const d = dist(u, u.attackTarget);
             if (d <= u.range) {
                 if (u.atkCooldown <= 0) {
-                    dealDamage(u, u.attackTarget);
+                    fireAt(u, u.attackTarget);
                     u.atkCooldown = 1 / u.atkSpd;
                 }
                 return;
@@ -420,6 +690,8 @@ export default function initPlasticSoldiersGame(root) {
     }
 
     function update(dt) {
+        updateEffects(dt);
+        updateProjectiles(dt);
         if (gameOver) return;
 
         player.resource += player.resourceRate * dt;
@@ -445,8 +717,8 @@ export default function initPlasticSoldiersGame(root) {
         if (player.base.alive) updateCombatant(player.base, dt, enemy, { canChase: false, canMove: false });
         if (enemy.base.alive) updateCombatant(enemy.base, dt, player, { canChase: false, canMove: false });
 
-        player.units = player.units.filter((u) => u.alive || u.hitFlash > 0);
-        enemy.units = enemy.units.filter((u) => u.alive || u.hitFlash > 0);
+        player.units = player.units.filter((u) => u.alive);
+        enemy.units = enemy.units.filter((u) => u.alive);
 
         runAi(dt);
     }
@@ -482,8 +754,16 @@ export default function initPlasticSoldiersGame(root) {
         }
     }
 
-    function drawSoldier(u, isEnemyTeam) {
+    // --- Rendering ---
+
+    function drawSoldier(u) {
         const colors = TEAM_COLORS[u.team];
+
+        ctx.beginPath();
+        ctx.ellipse(u.x, u.y + u.radius * 0.55, u.radius * 0.95, u.radius * 0.4, 0, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(0,0,0,0.25)';
+        ctx.fill();
+
         ctx.save();
         ctx.translate(u.x, u.y);
 
@@ -495,29 +775,59 @@ export default function initPlasticSoldiersGame(root) {
             ctx.stroke();
         }
 
-        // gun barrel toward attack target or facing direction
         let angle = 0;
-        if (u.attackTarget) {
-            angle = Math.atan2(u.attackTarget.y - u.y, u.attackTarget.x - u.x);
-        } else if (u.dest) {
-            angle = Math.atan2(u.dest.y - u.y, u.dest.x - u.x);
-        }
+        if (u.attackTarget) angle = Math.atan2(u.attackTarget.y - u.y, u.attackTarget.x - u.x);
+        else if (u.dest) angle = Math.atan2(u.dest.y - u.y, u.dest.x - u.x);
+
+        ctx.save();
         ctx.rotate(angle);
         ctx.strokeStyle = colors.dark;
-        ctx.lineWidth = 2.5;
-        ctx.beginPath();
-        ctx.moveTo(0, 0);
-        ctx.lineTo(u.radius + 8, 0);
-        ctx.stroke();
-        ctx.rotate(-angle);
+        if (u.type === 'bazooka') {
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(-2, 0);
+            ctx.lineTo(u.radius + 11, 0);
+            ctx.stroke();
+            ctx.fillStyle = colors.dark;
+            ctx.beginPath();
+            ctx.arc(u.radius + 11, 0, 2.6, 0, Math.PI * 2);
+            ctx.fill();
+        } else if (u.type === 'gunner') {
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            ctx.moveTo(0, -1.5);
+            ctx.lineTo(u.radius + 9, -1.5);
+            ctx.moveTo(0, 1.5);
+            ctx.lineTo(u.radius + 6, 1.5);
+            ctx.stroke();
+        } else {
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(u.radius + 8, 0);
+            ctx.stroke();
+        }
+        ctx.restore();
 
+        if (u.hitFlash > 0) {
+            ctx.fillStyle = '#fff';
+        } else {
+            const grad = ctx.createRadialGradient(-u.radius * 0.3, -u.radius * 0.3, 1, 0, 0, u.radius);
+            grad.addColorStop(0, colors.bright);
+            grad.addColorStop(1, colors.body);
+            ctx.fillStyle = grad;
+        }
         ctx.beginPath();
         ctx.arc(0, 0, u.radius, 0, Math.PI * 2);
-        ctx.fillStyle = u.hitFlash > 0 ? '#fff' : colors.body;
         ctx.fill();
         ctx.strokeStyle = colors.dark;
         ctx.lineWidth = 1.5;
         ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(-u.radius * 0.25, -u.radius * 0.25, u.radius * 0.32, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255,255,255,0.22)';
+        ctx.fill();
 
         ctx.restore();
 
@@ -551,7 +861,14 @@ export default function initPlasticSoldiersGame(root) {
         ctx.fillRect(x, y, base.w, base.h);
         ctx.strokeRect(x, y, base.w, base.h);
 
-        // little flag on top
+        ctx.fillStyle = colors.dark;
+        for (let i = 0; i < 4; i++) {
+            const sx = x + 7 + (i * (base.w - 14)) / 3;
+            ctx.beginPath();
+            ctx.ellipse(sx, y + base.h - 4, 7, 4, 0, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
         ctx.strokeStyle = colors.dark;
         ctx.beginPath();
         ctx.moveTo(base.x, y);
@@ -578,10 +895,120 @@ export default function initPlasticSoldiersGame(root) {
         }
     }
 
+    function drawDecal(d) {
+        ctx.save();
+        ctx.translate(d.x, d.y);
+        ctx.rotate(d.rot);
+        ctx.globalAlpha = d.alpha;
+        if (d.kind === 'scorch') {
+            ctx.fillStyle = '#1a1410';
+            ctx.beginPath();
+            ctx.ellipse(0, 0, d.r, d.r * 0.7, 0, 0, Math.PI * 2);
+            ctx.fill();
+        } else {
+            ctx.fillStyle = '#7a1414';
+            ctx.beginPath();
+            ctx.ellipse(0, 0, d.r, d.r * 0.55, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.ellipse(d.r * 0.75, d.r * 0.35, d.r * 0.28, d.r * 0.18, 0.4, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        ctx.restore();
+    }
+
+    function drawCorpse(c) {
+        const colors = TEAM_COLORS[c.team];
+        ctx.save();
+        ctx.globalAlpha = c.ttl < 1 ? Math.max(0, c.ttl) : 1;
+        ctx.translate(c.x, c.y);
+        ctx.rotate(c.angle);
+        ctx.fillStyle = colors.dark;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 12, 5, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = colors.body;
+        ctx.beginPath();
+        ctx.ellipse(-2, 0, 8, 3.2, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+    }
+
+    function drawProjectile(pr) {
+        const angle = Math.atan2(pr.ty - pr.y, pr.tx - pr.x);
+        ctx.save();
+        ctx.translate(pr.x, pr.y);
+        ctx.rotate(angle);
+        ctx.fillStyle = '#2b2b2b';
+        ctx.fillRect(-6, -2, 12, 4);
+        ctx.fillStyle = '#ff9d3d';
+        ctx.beginPath();
+        ctx.arc(-6, 0, 2.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+    }
+
+    function drawParticle(p) {
+        const t = clamp(p.life / p.maxLife, 0, 1);
+        ctx.save();
+        if (p.type === 'blood') {
+            ctx.globalAlpha = t;
+            ctx.fillStyle = p.color;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            ctx.fill();
+        } else if (p.type === 'debris') {
+            ctx.globalAlpha = t;
+            ctx.translate(p.x, p.y);
+            ctx.rotate(p.rot);
+            ctx.fillStyle = p.color;
+            ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+        } else if (p.type === 'smoke') {
+            ctx.globalAlpha = t * 0.35;
+            ctx.fillStyle = '#555';
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, Math.max(0, p.size), 0, Math.PI * 2);
+            ctx.fill();
+        } else if (p.type === 'spark') {
+            ctx.globalAlpha = t;
+            ctx.strokeStyle = p.color;
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(p.x - p.vx * 0.03, p.y - p.vy * 0.03);
+            ctx.stroke();
+        } else if (p.type === 'shock') {
+            ctx.globalAlpha = t * 0.8;
+            ctx.strokeStyle = p.color;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, Math.max(0, p.size), 0, Math.PI * 2);
+            ctx.stroke();
+        } else if (p.type === 'text') {
+            ctx.globalAlpha = t;
+            ctx.fillStyle = p.color;
+            ctx.font = 'bold 11px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(p.text, p.x, p.y);
+        }
+        ctx.restore();
+    }
+
     function render() {
         ctx.clearRect(0, 0, WORLD_W, WORLD_H);
+
+        let sx = 0;
+        let sy = 0;
+        if (screenShake.ttl > 0) {
+            sx = (Math.random() - 0.5) * screenShake.mag;
+            sy = (Math.random() - 0.5) * screenShake.mag;
+        }
+
+        ctx.save();
+        ctx.translate(sx, sy);
+
         ctx.fillStyle = '#4c7a30';
-        ctx.fillRect(0, 0, WORLD_W, WORLD_H);
+        ctx.fillRect(-20, -20, WORLD_W + 40, WORLD_H + 40);
 
         for (const d of decorations) {
             ctx.beginPath();
@@ -590,11 +1017,17 @@ export default function initPlasticSoldiersGame(root) {
             ctx.fill();
         }
 
+        for (const d of decals) drawDecal(d);
+        for (const c of corpses) drawCorpse(c);
+
         if (player.base.alive) drawBase(player.base);
         if (enemy.base.alive) drawBase(enemy.base);
 
-        for (const u of enemy.units) drawSoldier(u, true);
-        for (const u of player.units) drawSoldier(u, false);
+        for (const u of enemy.units) drawSoldier(u);
+        for (const u of player.units) drawSoldier(u);
+
+        for (const pr of projectiles) drawProjectile(pr);
+        for (const p of particles) drawParticle(p);
 
         if (dragBox) {
             const x = Math.min(dragBox.x0, dragBox.x1);
@@ -607,6 +1040,8 @@ export default function initPlasticSoldiersGame(root) {
             ctx.fillRect(x, y, w, h);
             ctx.strokeRect(x, y, w, h);
         }
+
+        ctx.restore();
     }
 
     function updateHud() {
