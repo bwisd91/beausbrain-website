@@ -25,11 +25,11 @@ export default function Contact() {
 
   return (
         <section className="contact" id="contact">
-              <h2>Contact</h2>h2>
-              <p>Interested in working together? Reach out using the form below.</p>p>
+              <h2>Contact</h2>
+              <p>Interested in working together? Reach out using the form below.</p>
               <form onSubmit={handleSubmit} className="contact-form">
                       <div className="form-group">
-                                <label htmlFor="name">Name</label>label>
+                                <label htmlFor="name">Name</label>
                                 <input
                                               type="text"
                                               id="name"
@@ -38,9 +38,9 @@ export default function Contact() {
                                               onChange={handleChange}
                                               required
                                             />
-                      </div>div>
+                      </div>
                       <div className="form-group">
-                                <label htmlFor="email">Email</label>label>
+                                <label htmlFor="email">Email</label>
                                 <input
                                               type="email"
                                               id="email"
@@ -49,9 +49,9 @@ export default function Contact() {
                                               onChange={handleChange}
                                               required
                                             />
-                      </div>div>
+                      </div>
                       <div className="form-group">
-                                <label htmlFor="message">Message</label>label>
+                                <label htmlFor="message">Message</label>
                                 <textarea
                                               id="message"
                                               name="message"
@@ -60,9 +60,9 @@ export default function Contact() {
                                               required
                                               rows="5"
                                             />
-                      </div>div>
-                      <button type="submit" className="submit-button">Send Message</button>button>
-              </form>form>
-        </section>section>
+                      </div>
+                      <button type="submit" className="submit-button">Send Message</button>
+              </form>
+        </section>
       );
-}</section>
+}

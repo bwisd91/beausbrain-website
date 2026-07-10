@@ -4,16 +4,16 @@ export default function Footer() {
   return (
         <footer className="footer">
               <div className="footer-content">
-                      <p>© {currentYear} Beau Wisdom. All rights reserved.</p>p>
+                      <p>© {currentYear} Beau Wisdom. All rights reserved.</p>
                       <nav className="footer-nav">
                                 <ul>
-                                            <li><a href="#about">About</a>a></li>li>
-                                            <li><a href="#services">Services</a>a></li>li>
-                                            <li><a href="#thoughts">Thoughts</a>a></li>li>
-                                            <li><a href="#contact">Contact</a>a></li>li>
-                                </ul>ul>
-                      </nav>nav>
-              </div>div>
-        </footer>footer>
+                                            <li><a href="#about">About</a></li>
+                                            <li><a href="#services">Services</a></li>
+                                            <li><a href="#thoughts">Thoughts</a></li>
+                                            <li><a href="#contact">Contact</a></li>
+                                </ul>
+                      </nav>
+              </div>
+        </footer>
       );
-}</footer>
+}

@@ -23,8 +23,8 @@ export default function Home() {
                         <Thoughts />
                         <Credentials />
                         <Contact />
-                </main>main>
+                </main>
                 <Footer />
-          </>>
+          </>
         );
-}</>
+}

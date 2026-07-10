@@ -8,15 +8,15 @@ export default function Credentials() {
 
   return (
         <section className="credentials" id="credentials">
-              <h2>Credentials</h2>h2>
+              <h2>Credentials</h2>
               <ul className="credentials-list">
                 {credentials.map((credential, index) => (
                     <li key={index}>
-                                <span className="checkmark">✓</span>span>
+                                <span className="checkmark">✓</span>
                       {credential}
-                    </li>li>
+                    </li>
                   ))}
-              </ul>ul>
-        </section>section>
+              </ul>
+        </section>
       );
-}</section>
+}
