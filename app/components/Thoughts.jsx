@@ -22,18 +22,18 @@ export default function Thoughts() {
 
   return (
         <section className="thoughts" id="thoughts">
-              <h2>Thoughts</h2>h2>
-              <p>Reflections on behavioral health, education, and professional development.</p>p>
+              <h2>Thoughts</h2>
+              <p>Reflections on behavioral health, education, and professional development.</p>
               <div className="articles-list">
                 {articles.map((article) => (
                     <article key={article.slug} className="article-preview">
-                                <span className="article-date">{article.date}</span>span>
-                                <h3>{article.title}</h3>h3>
-                                <p>{article.excerpt}</p>p>
-                                <a href={`/thoughts/${article.slug}`}>Read more →</a>a>
-                    </article>article>
+                                <span className="article-date">{article.date}</span>
+                                <h3>{article.title}</h3>
+                                <p>{article.excerpt}</p>
+                                <a href={`/thoughts/${article.slug}`}>Read more →</a>
+                    </article>
                   ))}
-              </div>div>
-        </section>section>
+              </div>
+        </section>
       );
-}</section>
+}
