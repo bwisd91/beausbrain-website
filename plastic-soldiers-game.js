@@ -59,6 +59,12 @@ const TEAM_COLORS = {
     enemy: { body: '#a9915a', dark: '#75603a', bright: '#cdb583', label: 'Tan Army' },
 };
 
+const DIFFICULTIES = {
+    easy: { label: 'Easy', enemyResourceRate: 8, unitCap: 16, waveThreshold: 5, waveMin: 14, waveMax: 20 },
+    normal: { label: 'Normal', enemyResourceRate: 12, unitCap: 24, waveThreshold: 4, waveMin: 10, waveMax: 14 },
+    hard: { label: 'Hard', enemyResourceRate: 16, unitCap: 32, waveThreshold: 3, waveMin: 7, waveMax: 10 },
+};
+
 const STYLE_ID = 'plastic-soldiers-game-styles';
 const STYLES = `
 .ps-wrap {
@@ -66,6 +72,87 @@ const STYLES = `
     margin: 0 auto;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     color: #222;
+}
+.ps-wrap[data-screen="menu"] .ps-battle { display: none; }
+.ps-wrap[data-screen="playing"] .ps-menu { display: none; }
+.ps-menu {
+    background: #2b3a1f;
+    border-radius: 8px;
+    padding: 40px 20px;
+    display: flex;
+    justify-content: center;
+}
+.ps-menu-card {
+    background: #eef2e6;
+    border-radius: 10px;
+    padding: 32px 36px;
+    max-width: 420px;
+    width: 100%;
+    text-align: center;
+}
+.ps-title {
+    font-size: 26px;
+    margin: 0 0 8px;
+    color: #223016;
+}
+.ps-tagline {
+    font-size: 14px;
+    color: #556047;
+    margin: 0 0 22px;
+    line-height: 1.5;
+}
+.ps-difficulty { margin-bottom: 22px; }
+.ps-difficulty-label {
+    display: block;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #6b7a5a;
+    margin-bottom: 8px;
+}
+.ps-difficulty-options {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+}
+.ps-diff-btn {
+    flex: 1;
+    background: #fff;
+    border: 2px solid #cdd8c0;
+    border-radius: 6px;
+    padding: 8px 6px;
+    font-size: 13px;
+    cursor: pointer;
+    color: #263015;
+}
+.ps-diff-btn.ps-active {
+    border-color: #6fae43;
+    background: #eaf5df;
+    font-weight: 600;
+}
+.ps-start-btn {
+    display: block;
+    width: 100%;
+    background: #6fae43;
+    color: #fff;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 14px;
+}
+.ps-start-btn:hover { background: #5b9235; }
+.ps-mute-btn {
+    background: #fff;
+    border: 2px solid #cdd8c0;
+    border-radius: 6px;
+    width: 38px;
+    height: 38px;
+    font-size: 16px;
+    cursor: pointer;
+    line-height: 1;
 }
 .ps-hud {
     display: flex;
@@ -81,6 +168,30 @@ const STYLES = `
 }
 .ps-resource strong { color: #ffd166; }
 .ps-status { font-weight: 600; }
+.ps-hud-controls {
+    display: flex;
+    gap: 8px;
+    margin-left: auto;
+    align-items: center;
+}
+.ps-hud .ps-mute-btn {
+    width: auto;
+    height: auto;
+    padding: 6px 10px;
+    background: transparent;
+    border-color: #4c5a3a;
+    color: #eef5e4;
+}
+.ps-pause-btn {
+    background: transparent;
+    border: 1px solid #4c5a3a;
+    color: #eef5e4;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 13px;
+    cursor: pointer;
+}
+.ps-pause-btn:hover { background: rgba(255, 255, 255, 0.08); }
 .ps-canvas-holder {
     position: relative;
     width: 100%;
@@ -149,7 +260,7 @@ const STYLES = `
     padding: 8px 16px 0;
     margin: 0;
 }
-.ps-overlay {
+.ps-overlay, .ps-pause-overlay {
     position: absolute;
     inset: 0;
     background: rgba(20, 26, 12, 0.82);
@@ -157,7 +268,7 @@ const STYLES = `
     align-items: center;
     justify-content: center;
 }
-.ps-overlay[hidden] { display: none; }
+.ps-overlay[hidden], .ps-pause-overlay[hidden] { display: none; }
 .ps-overlay-card {
     background: #fff;
     padding: 28px 36px;
@@ -165,16 +276,30 @@ const STYLES = `
     text-align: center;
 }
 .ps-overlay-card h2 { margin: 0 0 16px; color: #222; }
-.ps-restart {
-    background: #6fae43;
-    color: #fff;
+.ps-overlay-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+.ps-overlay-actions-col { flex-direction: column; }
+.ps-overlay-actions button {
     border: none;
     padding: 10px 22px;
     border-radius: 6px;
     font-size: 15px;
     cursor: pointer;
 }
-.ps-restart:hover { background: #5b9235; }
+.ps-restart, .ps-resume-btn {
+    background: #6fae43;
+    color: #fff;
+}
+.ps-restart:hover, .ps-resume-btn:hover { background: #5b9235; }
+.ps-overlay-menu, .ps-pause-restart, .ps-pause-menu {
+    background: #fff;
+    color: #263015;
+    border: 2px solid #cdd8c0 !important;
+}
 `;
 
 function ensureStyles() {
@@ -194,46 +319,100 @@ function clamp(v, min, max) {
     return Math.max(min, Math.min(max, v));
 }
 
+function loadPref(key, fallback) {
+    try {
+        const v = window.localStorage.getItem(key);
+        return v === null ? fallback : v;
+    } catch {
+        return fallback;
+    }
+}
+
+function savePref(key, value) {
+    try {
+        window.localStorage.setItem(key, value);
+    } catch {
+        // Storage disabled (privacy mode, etc.) - preference just won't persist.
+    }
+}
+
 export default function initPlasticSoldiersGame(root) {
     ensureStyles();
 
     root.innerHTML = `
-        <div class="ps-wrap">
-            <div class="ps-hud">
-                <div class="ps-resource">Toy Box Reserves: <strong class="ps-resource-val">0</strong></div>
-                <div class="ps-status"></div>
-            </div>
-            <div class="ps-canvas-holder">
-                <canvas class="ps-canvas" width="${WORLD_W}" height="${WORLD_H}"></canvas>
-                <div class="ps-overlay" hidden>
-                    <div class="ps-overlay-card">
-                        <h2 class="ps-overlay-title"></h2>
-                        <button class="ps-restart" type="button">Play Again</button>
+        <div class="ps-wrap" data-screen="menu">
+            <div class="ps-menu">
+                <div class="ps-menu-card">
+                    <h1 class="ps-title">Plastic Soldiers RTS</h1>
+                    <p class="ps-tagline">Mass your green army men, storm the enemy toy box, and win the battle for the carpet.</p>
+                    <div class="ps-difficulty">
+                        <span class="ps-difficulty-label">Difficulty</span>
+                        <div class="ps-difficulty-options">
+                            <button class="ps-diff-btn" data-difficulty="easy" type="button">Easy</button>
+                            <button class="ps-diff-btn" data-difficulty="normal" type="button">Normal</button>
+                            <button class="ps-diff-btn" data-difficulty="hard" type="button">Hard</button>
+                        </div>
                     </div>
+                    <button class="ps-start-btn" type="button">Start Battle</button>
+                    <button class="ps-mute-btn" type="button" aria-label="Toggle sound">🔊</button>
                 </div>
             </div>
-            <div class="ps-buildbar">
-                <button class="ps-build-btn" data-type="rifleman" type="button">
-                    <span class="ps-icon">🪖</span>
-                    <span class="ps-label">Rifleman</span>
-                    <span class="ps-cost">50</span>
-                </button>
-                <button class="ps-build-btn" data-type="gunner" type="button">
-                    <span class="ps-icon">🔫</span>
-                    <span class="ps-label">Gunner</span>
-                    <span class="ps-cost">90</span>
-                </button>
-                <button class="ps-build-btn" data-type="bazooka" type="button">
-                    <span class="ps-icon">💥</span>
-                    <span class="ps-label">Bazooka</span>
-                    <span class="ps-cost">130</span>
-                </button>
-                <div class="ps-queue"></div>
+
+            <div class="ps-battle">
+                <div class="ps-hud">
+                    <div class="ps-resource">Toy Box Reserves: <strong class="ps-resource-val">0</strong></div>
+                    <div class="ps-status"></div>
+                    <div class="ps-hud-controls">
+                        <button class="ps-mute-btn" type="button" aria-label="Toggle sound">🔊</button>
+                        <button class="ps-pause-btn" type="button">Pause</button>
+                    </div>
+                </div>
+                <div class="ps-canvas-holder">
+                    <canvas class="ps-canvas" width="${WORLD_W}" height="${WORLD_H}"></canvas>
+                    <div class="ps-overlay" hidden>
+                        <div class="ps-overlay-card">
+                            <h2 class="ps-overlay-title"></h2>
+                            <div class="ps-overlay-actions">
+                                <button class="ps-restart" type="button">Play Again</button>
+                                <button class="ps-overlay-menu" type="button">Main Menu</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ps-pause-overlay" hidden>
+                        <div class="ps-overlay-card">
+                            <h2>Paused</h2>
+                            <div class="ps-overlay-actions ps-overlay-actions-col">
+                                <button class="ps-resume-btn" type="button">Resume</button>
+                                <button class="ps-pause-restart" type="button">Restart Battle</button>
+                                <button class="ps-pause-menu" type="button">Main Menu</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="ps-buildbar">
+                    <button class="ps-build-btn" data-type="rifleman" type="button">
+                        <span class="ps-icon">🪖</span>
+                        <span class="ps-label">Rifleman</span>
+                        <span class="ps-cost">50</span>
+                    </button>
+                    <button class="ps-build-btn" data-type="gunner" type="button">
+                        <span class="ps-icon">🔫</span>
+                        <span class="ps-label">Gunner</span>
+                        <span class="ps-cost">90</span>
+                    </button>
+                    <button class="ps-build-btn" data-type="bazooka" type="button">
+                        <span class="ps-icon">💥</span>
+                        <span class="ps-label">Bazooka</span>
+                        <span class="ps-cost">130</span>
+                    </button>
+                    <div class="ps-queue"></div>
+                </div>
+                <p class="ps-help">Drag to select your green army men &middot; right-click to move &middot; right-click an enemy to attack &middot; Esc to pause.</p>
             </div>
-            <p class="ps-help">Drag to select your green army men &middot; right-click to move &middot; right-click an enemy to attack.</p>
         </div>
     `;
 
+    const wrapEl = root.querySelector('.ps-wrap');
     const canvas = root.querySelector('.ps-canvas');
     const ctx = canvas.getContext('2d');
     const resourceEl = root.querySelector('.ps-resource-val');
@@ -241,6 +420,15 @@ export default function initPlasticSoldiersGame(root) {
     const overlayEl = root.querySelector('.ps-overlay');
     const overlayTitleEl = root.querySelector('.ps-overlay-title');
     const restartBtn = root.querySelector('.ps-restart');
+    const overlayMenuBtn = root.querySelector('.ps-overlay-menu');
+    const pauseOverlayEl = root.querySelector('.ps-pause-overlay');
+    const resumeBtn = root.querySelector('.ps-resume-btn');
+    const pauseRestartBtn = root.querySelector('.ps-pause-restart');
+    const pauseMenuBtn = root.querySelector('.ps-pause-menu');
+    const pauseBtn = root.querySelector('.ps-pause-btn');
+    const startBtn = root.querySelector('.ps-start-btn');
+    const diffButtons = Array.from(root.querySelectorAll('.ps-diff-btn'));
+    const muteButtons = Array.from(root.querySelectorAll('.ps-mute-btn'));
     const queueEl = root.querySelector('.ps-queue');
     const buildButtons = Array.from(root.querySelectorAll('.ps-build-btn'));
 
@@ -255,8 +443,100 @@ export default function initPlasticSoldiersGame(root) {
         });
     }
 
-    let player, enemy, selected, dragBox, gameOver, lastTs, rafId, aiTimer;
+    let player, enemy, selected, dragBox, gameOver, paused, lastTs, rafId, aiTimer;
     let particles, decals, corpses, projectiles, screenShake;
+    let screen = 'menu';
+    let difficulty = DIFFICULTIES[loadPref('ps-difficulty', 'normal')] ? loadPref('ps-difficulty', 'normal') : 'normal';
+    let muted = loadPref('ps-muted', 'false') === 'true';
+    let audioCtx = null;
+
+    // --- Sound: tiny procedural WebAudio SFX, no asset files ---
+
+    function getAudioCtx() {
+        if (typeof window === 'undefined') return null;
+        const Ctx = window.AudioContext || window.webkitAudioContext;
+        if (!Ctx) return null;
+        if (!audioCtx) audioCtx = new Ctx();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        return audioCtx;
+    }
+
+    function playTone(freq, duration, opts = {}) {
+        if (muted) return;
+        const ac = getAudioCtx();
+        if (!ac) return;
+        const { type = 'sine', gain = 0.15, freqEnd, delay = 0 } = opts;
+        const t0 = ac.currentTime + delay;
+        const osc = ac.createOscillator();
+        const g = ac.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, t0);
+        if (freqEnd) osc.frequency.linearRampToValueAtTime(freqEnd, t0 + duration);
+        g.gain.setValueAtTime(0, t0);
+        g.gain.linearRampToValueAtTime(gain, t0 + 0.01);
+        g.gain.exponentialRampToValueAtTime(0.001, t0 + duration);
+        osc.connect(g).connect(ac.destination);
+        osc.start(t0);
+        osc.stop(t0 + duration + 0.02);
+    }
+
+    function playNoise(duration, opts = {}) {
+        if (muted) return;
+        const ac = getAudioCtx();
+        if (!ac) return;
+        const { filterFreq = 2000, filterFreqEnd, gain = 0.2, delay = 0 } = opts;
+        const t0 = ac.currentTime + delay;
+        const bufferSize = Math.max(1, Math.floor(ac.sampleRate * duration));
+        const buffer = ac.createBuffer(1, bufferSize, ac.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+        const src = ac.createBufferSource();
+        src.buffer = buffer;
+        const filter = ac.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.setValueAtTime(filterFreq, t0);
+        if (filterFreqEnd) filter.frequency.linearRampToValueAtTime(filterFreqEnd, t0 + duration);
+        const g = ac.createGain();
+        g.gain.setValueAtTime(gain, t0);
+        g.gain.exponentialRampToValueAtTime(0.001, t0 + duration);
+        src.connect(filter).connect(g).connect(ac.destination);
+        src.start(t0);
+        src.stop(t0 + duration + 0.02);
+    }
+
+    let lastShotSoundAt = -1000;
+    function playShotSound() {
+        const now = (typeof performance !== 'undefined' ? performance.now() : Date.now());
+        if (now - lastShotSoundAt < 45) return;
+        lastShotSoundAt = now;
+        playNoise(0.06, { filterFreq: 1800, gain: 0.16 });
+    }
+
+    function playExplosionSound(big) {
+        playNoise(big ? 0.35 : 0.2, { filterFreq: big ? 900 : 1300, filterFreqEnd: 200, gain: big ? 0.32 : 0.22 });
+        playTone(big ? 90 : 140, big ? 0.3 : 0.18, { freqEnd: 40, gain: big ? 0.2 : 0.12 });
+    }
+
+    function playBuildCompleteSound() {
+        playTone(520, 0.09, { type: 'triangle', gain: 0.14 });
+        playTone(760, 0.12, { type: 'triangle', gain: 0.14, delay: 0.08 });
+    }
+
+    function playDeniedSound() {
+        playTone(160, 0.18, { type: 'square', gain: 0.12, freqEnd: 90 });
+    }
+
+    function playVictorySound() {
+        [520, 660, 880].forEach((f, i) => playTone(f, 0.22, { type: 'triangle', gain: 0.18, delay: i * 0.12 }));
+    }
+
+    function playDefeatSound() {
+        [420, 340, 220].forEach((f, i) => playTone(f, 0.3, { type: 'sawtooth', gain: 0.14, delay: i * 0.14 }));
+    }
+
+    function playClickSound() {
+        playTone(700, 0.05, { type: 'square', gain: 0.08 });
+    }
 
     function makeBase(team, x, y) {
         const size = 84;
@@ -321,14 +601,18 @@ export default function initPlasticSoldiersGame(root) {
             hitFlash: 0,
             tracer: null,
         });
+        if (side === player) playBuildCompleteSound();
     }
 
     function resetGame() {
+        const diff = DIFFICULTIES[difficulty];
         player = makeSide('player', makeBase('player', 30, WORLD_H - 30 - 84));
         enemy = makeSide('enemy', makeBase('enemy', WORLD_W - 30 - 84, 30));
+        enemy.resourceRate = diff.enemyResourceRate;
         selected = [];
         dragBox = null;
         gameOver = false;
+        paused = false;
         aiTimer = 3;
         particles = [];
         decals = [];
@@ -336,7 +620,14 @@ export default function initPlasticSoldiersGame(root) {
         projectiles = [];
         screenShake = { ttl: 0, mag: 0 };
         overlayEl.hidden = true;
+        pauseOverlayEl.hidden = true;
         statusEl.textContent = '';
+        pauseBtn.textContent = 'Pause';
+    }
+
+    function setScreen(next) {
+        screen = next;
+        wrapEl.setAttribute('data-screen', screen);
     }
 
     function findNearestEnemy(from, side, maxRange) {
@@ -502,6 +793,7 @@ export default function initPlasticSoldiersGame(root) {
         spawnDebris(x, y, '#3a3a3a', '#6b6b6b', big ? 8 : 4);
         addDecal('scorch', x, y);
         triggerShake(big ? 9 : 4, big ? 0.35 : 0.16);
+        playExplosionSound(big);
     }
 
     function killUnit(u) {
@@ -531,6 +823,7 @@ export default function initPlasticSoldiersGame(root) {
             const ang = Math.atan2(target.y - attacker.y, target.x - attacker.x);
             const originR = attacker.radius || (attacker.w ? attacker.w / 2 : 10);
             spawnSparks(attacker.x + Math.cos(ang) * originR, attacker.y + Math.sin(ang) * originR, ang, 3);
+            playShotSound();
         }
 
         if (target.hp <= 0) {
@@ -543,6 +836,8 @@ export default function initPlasticSoldiersGame(root) {
                 statusEl.textContent = target.team === 'player' ? 'Defeat! Your toy box was overrun.' : 'Victory! The enemy base is scattered!';
                 overlayTitleEl.textContent = target.team === 'player' ? 'Defeat' : 'Victory!';
                 overlayEl.hidden = false;
+                if (target.team === 'player') playDefeatSound();
+                else playVictorySound();
             } else {
                 killUnit(target);
             }
@@ -553,6 +848,7 @@ export default function initPlasticSoldiersGame(root) {
         if (attacker.type === 'bazooka') {
             const ang = Math.atan2(target.y - attacker.y, target.x - attacker.x);
             spawnSparks(attacker.x + Math.cos(ang) * (attacker.radius + 8), attacker.y + Math.sin(ang) * (attacker.radius + 8), ang, 4);
+            playShotSound();
             projectiles.push({
                 x: attacker.x,
                 y: attacker.y,
@@ -730,7 +1026,8 @@ export default function initPlasticSoldiersGame(root) {
     }
 
     function runAi(dt) {
-        if (enemy.units.length < 24 && enemy.queue.length < 2) {
+        const diff = DIFFICULTIES[difficulty];
+        if (enemy.units.length < diff.unitCap && enemy.queue.length < 2) {
             const pick = cheapestAffordable(enemy.resource);
             if (pick) {
                 enemy.resource -= pick.cost;
@@ -740,9 +1037,9 @@ export default function initPlasticSoldiersGame(root) {
 
         aiTimer -= dt;
         if (aiTimer <= 0) {
-            aiTimer = 10 + Math.random() * 4;
+            aiTimer = diff.waveMin + Math.random() * (diff.waveMax - diff.waveMin);
             const idle = enemy.units.filter((u) => u.alive && !u.dest && !u.attackTarget);
-            if (idle.length >= 4) {
+            if (idle.length >= diff.waveThreshold) {
                 for (const u of idle) {
                     u.dest = {
                         x: clamp(player.base.x + (Math.random() - 0.5) * 60, 20, WORLD_W - 20),
@@ -1068,10 +1365,84 @@ export default function initPlasticSoldiersGame(root) {
         if (lastTs == null) lastTs = ts;
         const dt = Math.min(0.05, (ts - lastTs) / 1000);
         lastTs = ts;
-        update(dt);
-        render();
-        updateHud();
+        if (screen === 'playing') {
+            if (!paused) update(dt);
+            render();
+            updateHud();
+        }
         rafId = requestAnimationFrame(loop);
+    }
+
+    // --- Menu / pause UI wiring ---
+
+    function updateDifficultyButtons() {
+        diffButtons.forEach((btn) => {
+            btn.classList.toggle('ps-active', btn.getAttribute('data-difficulty') === difficulty);
+        });
+    }
+
+    function updateMuteButtons() {
+        const icon = muted ? '🔇' : '🔊';
+        muteButtons.forEach((btn) => {
+            btn.textContent = icon;
+        });
+    }
+
+    function togglePause() {
+        if (screen !== 'playing' || gameOver) return;
+        paused = !paused;
+        pauseOverlayEl.hidden = !paused;
+        pauseBtn.textContent = paused ? 'Resume' : 'Pause';
+        playClickSound();
+    }
+
+    function onDifficultyClick(evt) {
+        difficulty = evt.currentTarget.getAttribute('data-difficulty');
+        savePref('ps-difficulty', difficulty);
+        updateDifficultyButtons();
+        playClickSound();
+    }
+
+    function onMuteClick() {
+        muted = !muted;
+        savePref('ps-muted', String(muted));
+        updateMuteButtons();
+        if (!muted) playClickSound();
+    }
+
+    function onStartClick() {
+        getAudioCtx();
+        playClickSound();
+        resetGame();
+        setScreen('playing');
+    }
+
+    function onPauseClick() {
+        togglePause();
+    }
+
+    function onResumeClick() {
+        togglePause();
+    }
+
+    function onPauseRestartClick() {
+        playClickSound();
+        resetGame();
+    }
+
+    function onPauseMenuClick() {
+        playClickSound();
+        pauseOverlayEl.hidden = true;
+        setScreen('menu');
+    }
+
+    function onOverlayMenuClick() {
+        playClickSound();
+        setScreen('menu');
+    }
+
+    function onKeyDown(evt) {
+        if (evt.key === 'Escape') togglePause();
     }
 
     // --- Input handling ---
@@ -1184,11 +1555,13 @@ export default function initPlasticSoldiersGame(root) {
             player.queue.push({ type, timeLeft: cfg.buildTime });
         } else {
             btn.classList.add('ps-flash');
+            playDeniedSound();
             setTimeout(() => btn.classList.remove('ps-flash'), 250);
         }
     }
 
     function onRestart() {
+        playClickSound();
         resetGame();
     }
 
@@ -1198,7 +1571,18 @@ export default function initPlasticSoldiersGame(root) {
     canvas.addEventListener('contextmenu', onContextMenu);
     buildButtons.forEach((btn) => btn.addEventListener('click', onBuildClick));
     restartBtn.addEventListener('click', onRestart);
+    overlayMenuBtn.addEventListener('click', onOverlayMenuClick);
+    diffButtons.forEach((btn) => btn.addEventListener('click', onDifficultyClick));
+    muteButtons.forEach((btn) => btn.addEventListener('click', onMuteClick));
+    startBtn.addEventListener('click', onStartClick);
+    pauseBtn.addEventListener('click', onPauseClick);
+    resumeBtn.addEventListener('click', onResumeClick);
+    pauseRestartBtn.addEventListener('click', onPauseRestartClick);
+    pauseMenuBtn.addEventListener('click', onPauseMenuClick);
+    window.addEventListener('keydown', onKeyDown);
 
+    updateDifficultyButtons();
+    updateMuteButtons();
     resetGame();
     rafId = requestAnimationFrame(loop);
 
@@ -1210,5 +1594,15 @@ export default function initPlasticSoldiersGame(root) {
         canvas.removeEventListener('contextmenu', onContextMenu);
         buildButtons.forEach((btn) => btn.removeEventListener('click', onBuildClick));
         restartBtn.removeEventListener('click', onRestart);
+        overlayMenuBtn.removeEventListener('click', onOverlayMenuClick);
+        diffButtons.forEach((btn) => btn.removeEventListener('click', onDifficultyClick));
+        muteButtons.forEach((btn) => btn.removeEventListener('click', onMuteClick));
+        startBtn.removeEventListener('click', onStartClick);
+        pauseBtn.removeEventListener('click', onPauseClick);
+        resumeBtn.removeEventListener('click', onResumeClick);
+        pauseRestartBtn.removeEventListener('click', onPauseRestartClick);
+        pauseMenuBtn.removeEventListener('click', onPauseMenuClick);
+        window.removeEventListener('keydown', onKeyDown);
+        if (audioCtx) audioCtx.close();
     };
 }
