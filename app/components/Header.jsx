@@ -12,6 +12,7 @@ export default function Header() {
                                               <li><a href="#thoughts">Thoughts</a>a></li>li>
                                               <li><a href="#credentials">Credentials</a>a></li>li>
                                               <li><a href="#contact">Contact</a>a></li>li>
+                                              <li><a href="/plastic-soldiers">Game</a></li>
                                   </ul>ul>
                         </nav>nav>
                         <button className="menu-toggle" aria-label="Toggle menu">☰</button>button>
