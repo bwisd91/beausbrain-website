@@ -1,0 +1,2651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>RideForge — One Dashboard. Every Gig. Maximum Profit.</title>
+<style>
+:root {
+  --bg-primary: #0a0e17;
+  --bg-secondary: #111827;
+  --bg-card: #1a2235;
+  --bg-card-hover: #1f2a40;
+  --blue: #00d4ff;
+  --blue-dim: rgba(0,212,255,0.15);
+  --green: #00ff88;
+  --green-dim: rgba(0,255,136,0.15);
+  --red: #ff4466;
+  --red-dim: rgba(255,68,102,0.15);
+  --yellow: #ffbb33;
+  --yellow-dim: rgba(255,187,51,0.15);
+  --orange: #ff8844;
+  --purple: #aa66ff;
+  --text-primary: #f0f4ff;
+  --text-secondary: #8899bb;
+  --text-dim: #556688;
+  --border: #1e2d4a;
+  --radius: 16px;
+  --radius-sm: 10px;
+  --shadow: 0 4px 24px rgba(0,0,0,0.4);
+  --transition: 0.25s cubic-bezier(0.4,0,0.2,1);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+html, body {
+  height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── App Shell ─── */
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  position: relative;
+}
+
+@media (min-width: 768px) {
+  .app { max-width: 480px; border-left: 1px solid var(--border); border-right: 1px solid var(--border); }
+}
+
+/* ─── Header ─── */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+  z-index: 10;
+  flex-shrink: 0;
+}
+
+.header-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.header-logo svg { width: 28px; height: 28px; }
+
+.header-logo .ride { color: var(--text-primary); }
+.header-logo .forge { color: var(--blue); }
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.header-btn {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 4px;
+  transition: color var(--transition);
+}
+
+.header-btn:hover { color: var(--blue); }
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 8px var(--green);
+  animation: pulse-dot 2s infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* ─── Content Area ─── */
+.content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+.content::-webkit-scrollbar { width: 0; }
+
+.tab-content {
+  display: none;
+  padding: 16px 16px 100px;
+  animation: fadeIn 0.3s ease;
+}
+
+.tab-content.active { display: block; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── Bottom Navigation ─── */
+.bottom-nav {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 8px 0 max(8px, env(safe-area-inset-bottom));
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+  z-index: 20;
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 6px 12px;
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+  position: relative;
+}
+
+.nav-item svg { width: 22px; height: 22px; transition: all var(--transition); }
+
+.nav-item.active {
+  color: var(--blue);
+}
+
+.nav-item.active::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 24px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--blue);
+}
+
+/* ─── Cards ─── */
+.card {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 14px;
+  border: 1px solid var(--border);
+  transition: all var(--transition);
+}
+
+.card:hover { border-color: rgba(0,212,255,0.2); }
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.card-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.card-badge {
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-weight: 600;
+}
+
+.badge-green { background: var(--green-dim); color: var(--green); }
+.badge-yellow { background: var(--yellow-dim); color: var(--yellow); }
+.badge-red { background: var(--red-dim); color: var(--red); }
+.badge-blue { background: var(--blue-dim); color: var(--blue); }
+
+/* ─── Metrics Grid ─── */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.metric-card {
+  background: var(--bg-secondary);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  text-align: center;
+}
+
+.metric-value {
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.1;
+  margin-bottom: 4px;
+}
+
+.metric-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.metric-change {
+  font-size: 11px;
+  margin-top: 4px;
+  font-weight: 600;
+}
+
+.change-up { color: var(--green); }
+.change-down { color: var(--red); }
+
+/* ─── Status Bar ─── */
+.status-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 14px;
+}
+
+.status-bar.excellent { background: var(--green-dim); border: 1px solid rgba(0,255,136,0.3); }
+.status-bar.average { background: var(--yellow-dim); border: 1px solid rgba(255,187,51,0.3); }
+.status-bar.slow { background: var(--red-dim); border: 1px solid rgba(255,68,102,0.3); }
+
+.status-indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.status-bar.excellent .status-indicator { background: var(--green); box-shadow: 0 0 10px var(--green); }
+.status-bar.average .status-indicator { background: var(--yellow); box-shadow: 0 0 10px var(--yellow); }
+.status-bar.slow .status-indicator { background: var(--red); box-shadow: 0 0 10px var(--red); }
+
+.status-text {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.status-bar.excellent .status-text { color: var(--green); }
+.status-bar.average .status-text { color: var(--yellow); }
+.status-bar.slow .status-text { color: var(--red); }
+
+/* ─── Section Headers ─── */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+  margin-top: 8px;
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.section-link {
+  font-size: 13px;
+  color: var(--blue);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+/* ─── Platform List ─── */
+.platform-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.platform-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  cursor: pointer;
+  transition: all var(--transition);
+  border: 1px solid transparent;
+}
+
+.platform-item:hover { border-color: var(--blue); }
+
+.platform-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.platform-info {
+  min-width: 0;
+}
+
+.platform-name {
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.platform-earnings {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--green);
+}
+
+/* ─── Dispatch Cards ─── */
+.dispatch-card {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  padding: 18px;
+  margin-bottom: 12px;
+  border: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+}
+
+.dispatch-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+}
+
+.dispatch-card.accept::before { background: var(--green); }
+.dispatch-card.decline::before { background: var(--red); }
+
+.dispatch-verdict {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 3px 12px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+}
+
+.dispatch-card.accept .dispatch-verdict { background: var(--green-dim); color: var(--green); }
+.dispatch-card.decline .dispatch-verdict { background: var(--red-dim); color: var(--red); }
+
+.dispatch-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.dispatch-platform {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.dispatch-payout {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.dispatch-card.accept .dispatch-payout { color: var(--green); }
+.dispatch-card.decline .dispatch-payout { color: var(--red); }
+
+.dispatch-meta {
+  display: flex;
+  gap: 16px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+}
+
+.profit-score-bar {
+  height: 6px;
+  background: var(--bg-secondary);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.profit-score-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 1s ease;
+}
+
+.dispatch-card.accept .profit-score-fill { background: var(--green); }
+.dispatch-card.decline .profit-score-fill { background: var(--red); }
+
+.profit-score-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  margin-top: 4px;
+  color: var(--text-secondary);
+}
+
+/* ─── Map Placeholder ─── */
+.map-container {
+  position: relative;
+  width: 100%;
+  height: 300px;
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  margin-bottom: 14px;
+}
+
+.map-canvas {
+  width: 100%;
+  height: 100%;
+}
+
+.map-legend {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  font-weight: 600;
+  background: rgba(10,14,23,0.85);
+  padding: 4px 10px;
+  border-radius: 20px;
+  backdrop-filter: blur(8px);
+}
+
+.legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.map-action-btns {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.map-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(10,14,23,0.85);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  font-size: 18px;
+}
+
+/* ─── Tax Section ─── */
+.tax-summary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.tax-item {
+  background: var(--bg-secondary);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+}
+
+.tax-item-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+
+.tax-item-value {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.deduction-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.deduction-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-sm);
+}
+
+.deduction-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.deduction-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.deduction-name {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.deduction-amount {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--green);
+}
+
+/* ─── Maintenance ─── */
+.maint-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.maint-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-sm);
+}
+
+.maint-status-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 18px;
+}
+
+.maint-status-icon.good { background: var(--green-dim); }
+.maint-status-icon.warning { background: var(--yellow-dim); }
+.maint-status-icon.urgent { background: var(--red-dim); }
+
+.maint-info { flex: 1; min-width: 0; }
+
+.maint-name {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.maint-due {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.maint-miles {
+  font-size: 13px;
+  font-weight: 600;
+  text-align: right;
+}
+
+.maint-miles.good { color: var(--green); }
+.maint-miles.warning { color: var(--yellow); }
+.maint-miles.urgent { color: var(--red); }
+
+/* ─── Driver Score ─── */
+.score-ring-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 20px 0;
+  position: relative;
+}
+
+.score-ring-container canvas {
+  width: 200px;
+  height: 200px;
+}
+
+.score-center {
+  position: absolute;
+  text-align: center;
+}
+
+.score-value {
+  font-size: 48px;
+  font-weight: 700;
+  color: var(--blue);
+  line-height: 1;
+}
+
+.score-max {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.score-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.score-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.score-row-label {
+  font-size: 13px;
+  font-weight: 600;
+  width: 100px;
+  flex-shrink: 0;
+}
+
+.score-row-bar {
+  flex: 1;
+  height: 8px;
+  background: var(--bg-secondary);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.score-row-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 1s ease;
+}
+
+.score-row-value {
+  font-size: 13px;
+  font-weight: 700;
+  width: 40px;
+  text-align: right;
+}
+
+/* ─── Charts ─── */
+.chart-container {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  margin: 10px 0;
+}
+
+.chart-container canvas {
+  width: 100%;
+  height: 100%;
+}
+
+.chart-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.chart-tab {
+  padding: 7px 16px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: none;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.chart-tab.active {
+  background: var(--blue-dim);
+  color: var(--blue);
+  border-color: var(--blue);
+}
+
+/* ─── Expense Scanner ─── */
+.scanner-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all var(--transition);
+  margin-bottom: 14px;
+}
+
+.scanner-area:hover { border-color: var(--blue); }
+
+.scanner-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+  color: var(--blue);
+}
+
+.scanner-text {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.scanner-hint {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.recent-receipts {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.receipt-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-sm);
+}
+
+.receipt-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.receipt-thumb {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: var(--bg-card);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.receipt-merchant {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.receipt-date {
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.receipt-amount {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+/* ─── Emergency ─── */
+.emergency-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.emergency-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 20px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  cursor: pointer;
+  transition: all var(--transition);
+  text-align: center;
+}
+
+.emergency-btn:hover { border-color: var(--red); background: var(--red-dim); }
+
+.emergency-icon {
+  font-size: 28px;
+}
+
+.emergency-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* ─── Badges ─── */
+.badge-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+}
+
+.badge-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 16px 8px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-sm);
+  text-align: center;
+}
+
+.badge-item.earned { border: 1px solid rgba(0,212,255,0.3); }
+.badge-item.locked { opacity: 0.5; }
+
+.badge-emoji {
+  font-size: 32px;
+}
+
+.badge-name {
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.badge-progress {
+  font-size: 10px;
+  color: var(--text-secondary);
+}
+
+/* ─── Profile ─── */
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.profile-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--blue), var(--green));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--bg-primary);
+  flex-shrink: 0;
+}
+
+.profile-name {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.profile-since {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.profile-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.profile-stat {
+  text-align: center;
+  padding: 14px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-sm);
+}
+
+.profile-stat-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--blue);
+}
+
+.profile-stat-label {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+.settings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.settings-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  background: var(--bg-card);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background var(--transition);
+}
+
+.settings-item:hover { background: var(--bg-card-hover); }
+
+.settings-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.settings-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  background: var(--bg-secondary);
+}
+
+.settings-label {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.settings-chevron {
+  color: var(--text-dim);
+  font-size: 16px;
+}
+
+/* ─── Toggle ─── */
+.toggle {
+  width: 44px;
+  height: 24px;
+  border-radius: 12px;
+  background: var(--text-dim);
+  position: relative;
+  cursor: pointer;
+  transition: background var(--transition);
+}
+
+.toggle.active { background: var(--blue); }
+
+.toggle::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: white;
+  transition: transform var(--transition);
+}
+
+.toggle.active::after { transform: translateX(20px); }
+
+/* ─── Shift Button ─── */
+.shift-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 16px;
+  border-radius: var(--radius);
+  border: none;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition);
+  margin-bottom: 14px;
+}
+
+.shift-btn.start {
+  background: linear-gradient(135deg, var(--green), #00cc6a);
+  color: var(--bg-primary);
+}
+
+.shift-btn.stop {
+  background: linear-gradient(135deg, var(--red), #cc3355);
+  color: white;
+}
+
+.shift-btn:active { transform: scale(0.98); }
+
+/* ─── Voice ─── */
+.voice-btn {
+  position: fixed;
+  bottom: 80px;
+  right: max(16px, calc((100vw - 480px) / 2 + 16px));
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--blue), #0099cc);
+  border: none;
+  color: white;
+  font-size: 22px;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(0,212,255,0.4);
+  z-index: 15;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition);
+}
+
+.voice-btn:hover { transform: scale(1.08); }
+.voice-btn:active { transform: scale(0.95); }
+.voice-btn.listening {
+  animation: voice-pulse 1s infinite;
+  background: linear-gradient(135deg, var(--green), #00cc6a);
+}
+
+@keyframes voice-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(0,255,136,0.4); }
+  50% { box-shadow: 0 0 0 16px rgba(0,255,136,0); }
+}
+
+/* ─── Misc ─── */
+.divider {
+  height: 1px;
+  background: var(--border);
+  margin: 16px 0;
+}
+
+.earnings-total-card {
+  text-align: center;
+  padding: 28px 20px;
+}
+
+.earnings-big {
+  font-size: 44px;
+  font-weight: 700;
+  color: var(--green);
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.earnings-subtitle {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+/* ─── Quarterly Timeline ─── */
+.quarterly-timeline {
+  display: flex;
+  gap: 8px;
+}
+
+.q-item {
+  flex: 1;
+  text-align: center;
+  padding: 12px 6px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-sm);
+  position: relative;
+}
+
+.q-item.active { border: 1px solid var(--blue); }
+.q-item.paid { border: 1px solid var(--green); }
+
+.q-label {
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.q-amount {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.q-status {
+  font-size: 10px;
+  margin-top: 4px;
+  font-weight: 600;
+}
+
+.q-item.paid .q-status { color: var(--green); }
+.q-item.active .q-status { color: var(--yellow); }
+
+/* ─── Notification toast ─── */
+.toast {
+  position: fixed;
+  top: -60px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  padding: 12px 24px;
+  border-radius: var(--radius);
+  font-size: 14px;
+  font-weight: 600;
+  z-index: 100;
+  transition: top 0.4s ease;
+  box-shadow: var(--shadow);
+  white-space: nowrap;
+}
+
+.toast.show { top: 20px; }
+
+/* ─── Scrollbar ─── */
+.content::-webkit-scrollbar { width: 4px; }
+.content::-webkit-scrollbar-track { background: transparent; }
+.content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+/* ─── Responsive tweaks ─── */
+@media (min-width: 1024px) {
+  body {
+    background: #060a10;
+  }
+  .app {
+    box-shadow: 0 0 60px rgba(0,212,255,0.08);
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- Header -->
+  <div class="header">
+    <div class="header-logo">
+      <svg viewBox="0 0 28 28" fill="none">
+        <path d="M14 2L4 8v12l10 6 10-6V8L14 2z" stroke="var(--blue)" stroke-width="2" fill="none"/>
+        <path d="M8 12l4 4 8-8" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span><span class="ride">Ride</span><span class="forge">Forge</span></span>
+    </div>
+    <div class="header-right">
+      <div class="status-dot"></div>
+      <button class="header-btn" onclick="showToast('No new notifications')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
+      </button>
+      <button class="header-btn" onclick="showToast('Settings coming soon')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="content">
+
+    <!-- ════════ HOME TAB ════════ -->
+    <div class="tab-content active" id="tab-home">
+      <!-- Shift Button -->
+      <button class="shift-btn start" id="shiftBtn" onclick="toggleShift()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
+        START SHIFT
+      </button>
+
+      <!-- Status Bar -->
+      <div class="status-bar excellent" id="statusBar">
+        <div class="status-indicator"></div>
+        <div class="status-text">Excellent Day — Earning above average</div>
+      </div>
+
+      <!-- Today's Snapshot -->
+      <div class="section-header">
+        <div class="section-title">Today's Snapshot</div>
+        <span class="card-badge badge-green">Live</span>
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-value" style="color:var(--green)" id="grossEarnings">$187.42</div>
+          <div class="metric-label">Gross Earnings</div>
+          <div class="metric-change change-up">+12% vs avg</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value" style="color:var(--blue)" id="netEarnings">$141.38</div>
+          <div class="metric-label">Est. Net</div>
+          <div class="metric-change change-up">+8% vs avg</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value" id="bizMiles">92.7</div>
+          <div class="metric-label">Business Miles</div>
+          <div class="metric-change change-up">+5.2 mi</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value" id="activeHours">6.3</div>
+          <div class="metric-label">Active Hours</div>
+          <div class="metric-change change-down">-0.4 hr</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value" style="color:var(--yellow)" id="taxAside">$42</div>
+          <div class="metric-label">Taxes Set Aside</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value" style="color:var(--blue)" id="hourlyRate">$29.74</div>
+          <div class="metric-label">$/Hour</div>
+          <div class="metric-change change-up">Top 15%</div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Smart Dispatch Preview -->
+      <div class="section-header">
+        <div class="section-title">Smart Dispatch AI</div>
+        <button class="section-link" onclick="switchTab('earnings')">View All</button>
+      </div>
+
+      <div class="dispatch-card accept">
+        <div class="dispatch-verdict">Accept</div>
+        <div class="dispatch-details">
+          <div class="dispatch-platform">Uber Ride</div>
+          <div class="dispatch-payout">$17.25</div>
+        </div>
+        <div class="dispatch-meta">
+          <span>7.3 mi</span>
+          <span>18 min</span>
+          <span>$2.36/mi</span>
+        </div>
+        <div class="profit-score-bar"><div class="profit-score-fill" style="width:95%"></div></div>
+        <div class="profit-score-label">
+          <span>Profit Score</span>
+          <span>95/100</span>
+        </div>
+      </div>
+
+      <div class="dispatch-card decline">
+        <div class="dispatch-verdict">Decline</div>
+        <div class="dispatch-details">
+          <div class="dispatch-platform">DoorDash</div>
+          <div class="dispatch-payout">$4.25</div>
+        </div>
+        <div class="dispatch-meta">
+          <span>9.8 mi</span>
+          <span>32 min</span>
+          <span>$0.43/mi</span>
+        </div>
+        <div class="profit-score-bar"><div class="profit-score-fill" style="width:12%"></div></div>
+        <div class="profit-score-label">
+          <span>Profit Score</span>
+          <span>12/100</span>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Connected Platforms -->
+      <div class="section-header">
+        <div class="section-title">Platform Earnings</div>
+      </div>
+
+      <div class="platform-grid">
+        <div class="platform-item">
+          <div class="platform-icon" style="background:#000;color:#fff">U</div>
+          <div class="platform-info">
+            <div class="platform-name">Uber</div>
+            <div class="platform-earnings">$72.50</div>
+          </div>
+        </div>
+        <div class="platform-item">
+          <div class="platform-icon" style="background:#ea0b8c;color:#fff">L</div>
+          <div class="platform-info">
+            <div class="platform-name">Lyft</div>
+            <div class="platform-earnings">$38.20</div>
+          </div>
+        </div>
+        <div class="platform-item">
+          <div class="platform-icon" style="background:#06c167;color:#fff">UE</div>
+          <div class="platform-info">
+            <div class="platform-name">Uber Eats</div>
+            <div class="platform-earnings">$31.47</div>
+          </div>
+        </div>
+        <div class="platform-item">
+          <div class="platform-icon" style="background:#ff3008;color:#fff">DD</div>
+          <div class="platform-info">
+            <div class="platform-name">DoorDash</div>
+            <div class="platform-earnings">$22.15</div>
+          </div>
+        </div>
+        <div class="platform-item">
+          <div class="platform-icon" style="background:#0aad0a;color:#fff">IC</div>
+          <div class="platform-info">
+            <div class="platform-name">Instacart</div>
+            <div class="platform-earnings">$15.60</div>
+          </div>
+        </div>
+        <div class="platform-item">
+          <div class="platform-icon" style="background:#0071dc;color:#fff">SP</div>
+          <div class="platform-info">
+            <div class="platform-name">Spark</div>
+            <div class="platform-earnings">$7.50</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Driver Score Preview -->
+      <div class="section-header">
+        <div class="section-title">Driver Score</div>
+        <button class="section-link" onclick="switchTab('profile')">Details</button>
+      </div>
+
+      <div class="card">
+        <div class="score-ring-container">
+          <canvas id="scoreCanvas" width="200" height="200"></canvas>
+          <div class="score-center">
+            <div class="score-value">847</div>
+            <div class="score-max">/ 1000</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Emergency -->
+      <div class="section-header">
+        <div class="section-title">Emergency</div>
+      </div>
+
+      <div class="emergency-grid">
+        <button class="emergency-btn" onclick="showToast('Location shared with emergency contact')">
+          <div class="emergency-icon">📍</div>
+          <div class="emergency-label">Share Location</div>
+        </button>
+        <button class="emergency-btn" onclick="showToast('Calling 911...')">
+          <div class="emergency-icon">🚨</div>
+          <div class="emergency-label">Call 911</div>
+        </button>
+        <button class="emergency-btn" onclick="showToast('Recording started')">
+          <div class="emergency-icon">🎥</div>
+          <div class="emergency-label">Record</div>
+        </button>
+        <button class="emergency-btn" onclick="showToast('Incident note saved')">
+          <div class="emergency-icon">📝</div>
+          <div class="emergency-label">Incident Note</div>
+        </button>
+      </div>
+    </div>
+
+    <!-- ════════ MAP TAB ════════ -->
+    <div class="tab-content" id="tab-map">
+      <div class="section-header">
+        <div class="section-title">Live Profit Map</div>
+        <span class="card-badge badge-green">Live</span>
+      </div>
+
+      <div class="map-container">
+        <canvas class="map-canvas" id="mapCanvas"></canvas>
+        <div class="map-legend">
+          <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div>Surge</div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--yellow)"></div>Hotspot</div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div>High Demand</div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--purple)"></div>Events</div>
+        </div>
+        <div class="map-action-btns">
+          <button class="map-btn" onclick="showToast('Centering on your location')">⊕</button>
+          <button class="map-btn" onclick="showToast('Refreshing map data')">↻</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">AI Recommendation</div>
+          <span class="card-badge badge-blue">Smart</span>
+        </div>
+        <div style="font-size:14px;line-height:1.5">
+          Head to <strong style="color:var(--blue)">Downtown & 5th Ave</strong> area. Surge pricing active with 2.1x multiplier.
+          Estimated wait: <strong>3 min</strong> for next ride request.
+        </div>
+      </div>
+
+      <div class="section-header">
+        <div class="section-title">Nearby Hotspots</div>
+      </div>
+
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <div>
+            <div style="font-weight:700;font-size:15px">Airport Terminal B</div>
+            <div style="font-size:12px;color:var(--text-secondary)">3.2 mi away</div>
+          </div>
+          <span class="card-badge badge-green">High Demand</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <div>
+            <div style="font-weight:700;font-size:15px">Convention Center</div>
+            <div style="font-size:12px;color:var(--text-secondary)">1.8 mi away</div>
+          </div>
+          <span class="card-badge badge-yellow">Moderate</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div style="font-weight:700;font-size:15px">Stadium District</div>
+            <div style="font-size:12px;color:var(--text-secondary)">4.5 mi away — Concert 8PM</div>
+          </div>
+          <span class="card-badge badge-blue">Event</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Traffic & Weather</div>
+        </div>
+        <div style="display:flex;gap:12px">
+          <div style="flex:1;padding:12px;background:var(--bg-secondary);border-radius:var(--radius-sm);text-align:center">
+            <div style="font-size:24px;margin-bottom:4px">🚗</div>
+            <div style="font-size:13px;font-weight:600;color:var(--yellow)">Moderate</div>
+            <div style="font-size:11px;color:var(--text-secondary)">I-95 delays</div>
+          </div>
+          <div style="flex:1;padding:12px;background:var(--bg-secondary);border-radius:var(--radius-sm);text-align:center">
+            <div style="font-size:24px;margin-bottom:4px">☀️</div>
+            <div style="font-size:13px;font-weight:600;color:var(--green)">Clear</div>
+            <div style="font-size:11px;color:var(--text-secondary)">78°F</div>
+          </div>
+          <div style="flex:1;padding:12px;background:var(--bg-secondary);border-radius:var(--radius-sm);text-align:center">
+            <div style="font-size:24px;margin-bottom:4px">🔧</div>
+            <div style="font-size:13px;font-weight:600;color:var(--red)">1 Zone</div>
+            <div style="font-size:11px;color:var(--text-secondary)">Construction</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════ EARNINGS TAB ════════ -->
+    <div class="tab-content" id="tab-earnings">
+      <div class="card earnings-total-card">
+        <div class="earnings-big" id="weekEarnings">$1,247.83</div>
+        <div class="earnings-subtitle">This Week's Gross Earnings</div>
+      </div>
+
+      <div class="chart-tabs" id="earningsChartTabs">
+        <button class="chart-tab active" data-period="daily">Daily</button>
+        <button class="chart-tab" data-period="weekly">Weekly</button>
+        <button class="chart-tab" data-period="monthly">Monthly</button>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Earnings Trend</div>
+        </div>
+        <div class="chart-container">
+          <canvas id="earningsChart"></canvas>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Hourly Breakdown</div>
+        </div>
+        <div class="chart-container">
+          <canvas id="hourlyChart"></canvas>
+        </div>
+      </div>
+
+      <div class="section-header">
+        <div class="section-title">All Dispatch Offers</div>
+      </div>
+
+      <div class="dispatch-card accept">
+        <div class="dispatch-verdict">Accept</div>
+        <div class="dispatch-details">
+          <div class="dispatch-platform">Lyft Ride</div>
+          <div class="dispatch-payout">$22.40</div>
+        </div>
+        <div class="dispatch-meta">
+          <span>5.1 mi</span>
+          <span>14 min</span>
+          <span>$4.39/mi</span>
+        </div>
+        <div class="profit-score-bar"><div class="profit-score-fill" style="width:98%"></div></div>
+        <div class="profit-score-label"><span>Profit Score</span><span>98/100</span></div>
+      </div>
+
+      <div class="dispatch-card accept">
+        <div class="dispatch-verdict">Accept</div>
+        <div class="dispatch-details">
+          <div class="dispatch-platform">Uber Ride</div>
+          <div class="dispatch-payout">$17.25</div>
+        </div>
+        <div class="dispatch-meta">
+          <span>7.3 mi</span>
+          <span>18 min</span>
+          <span>$2.36/mi</span>
+        </div>
+        <div class="profit-score-bar"><div class="profit-score-fill" style="width:95%"></div></div>
+        <div class="profit-score-label"><span>Profit Score</span><span>95/100</span></div>
+      </div>
+
+      <div class="dispatch-card accept">
+        <div class="dispatch-verdict">Accept</div>
+        <div class="dispatch-details">
+          <div class="dispatch-platform">Instacart Batch</div>
+          <div class="dispatch-payout">$28.75</div>
+        </div>
+        <div class="dispatch-meta">
+          <span>4.2 mi</span>
+          <span>45 min</span>
+          <span>$38.33/hr</span>
+        </div>
+        <div class="profit-score-bar"><div class="profit-score-fill" style="width:82%"></div></div>
+        <div class="profit-score-label"><span>Profit Score</span><span>82/100</span></div>
+      </div>
+
+      <div class="dispatch-card decline">
+        <div class="dispatch-verdict">Decline</div>
+        <div class="dispatch-details">
+          <div class="dispatch-platform">DoorDash</div>
+          <div class="dispatch-payout">$4.25</div>
+        </div>
+        <div class="dispatch-meta">
+          <span>9.8 mi</span>
+          <span>32 min</span>
+          <span>$0.43/mi</span>
+        </div>
+        <div class="profit-score-bar"><div class="profit-score-fill" style="width:12%"></div></div>
+        <div class="profit-score-label"><span>Profit Score</span><span>12/100</span></div>
+      </div>
+
+      <div class="dispatch-card decline">
+        <div class="dispatch-verdict">Decline</div>
+        <div class="dispatch-details">
+          <div class="dispatch-platform">Grubhub</div>
+          <div class="dispatch-payout">$5.50</div>
+        </div>
+        <div class="dispatch-meta">
+          <span>11.3 mi</span>
+          <span>38 min</span>
+          <span>$0.49/mi</span>
+        </div>
+        <div class="profit-score-bar"><div class="profit-score-fill" style="width:18%"></div></div>
+        <div class="profit-score-label"><span>Profit Score</span><span>18/100</span></div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Expense Scanner -->
+      <div class="section-header">
+        <div class="section-title">Expense Scanner</div>
+      </div>
+
+      <div class="scanner-area" onclick="showToast('Camera opening... (demo mode)')">
+        <div class="scanner-icon">📷</div>
+        <div class="scanner-text">Scan a Receipt</div>
+        <div class="scanner-hint">Tap to photograph and auto-extract details</div>
+      </div>
+
+      <div class="section-header">
+        <div class="section-title">Recent Receipts</div>
+      </div>
+
+      <div class="recent-receipts">
+        <div class="receipt-item">
+          <div class="receipt-left">
+            <div class="receipt-thumb">⛽</div>
+            <div>
+              <div class="receipt-merchant">Shell Gas Station</div>
+              <div class="receipt-date">Today, 2:15 PM</div>
+            </div>
+          </div>
+          <div class="receipt-amount" style="color:var(--yellow)">-$48.32</div>
+        </div>
+        <div class="receipt-item">
+          <div class="receipt-left">
+            <div class="receipt-thumb">🧽</div>
+            <div>
+              <div class="receipt-merchant">Express Car Wash</div>
+              <div class="receipt-date">Yesterday, 10:30 AM</div>
+            </div>
+          </div>
+          <div class="receipt-amount" style="color:var(--yellow)">-$12.00</div>
+        </div>
+        <div class="receipt-item">
+          <div class="receipt-left">
+            <div class="receipt-thumb">🅿️</div>
+            <div>
+              <div class="receipt-merchant">Airport Parking</div>
+              <div class="receipt-date">Jul 23, 6:00 PM</div>
+            </div>
+          </div>
+          <div class="receipt-amount" style="color:var(--yellow)">-$8.00</div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Analytics -->
+      <div class="section-header">
+        <div class="section-title">Analytics</div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Cost Per Mile</div>
+          <span class="card-badge badge-green">$0.49</span>
+        </div>
+        <div class="chart-container">
+          <canvas id="costPerMileChart"></canvas>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Best Days</div>
+        </div>
+        <div class="chart-container" style="height:160px">
+          <canvas id="bestDaysChart"></canvas>
+        </div>
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-value" style="color:var(--green)">Fri</div>
+          <div class="metric-label">Best Day</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value" style="color:var(--blue)">Downtown</div>
+          <div class="metric-label" style="font-size:11px">Best Area</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value" style="color:var(--green)">Uber</div>
+          <div class="metric-label" style="font-size:11px">Most Profitable</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value" style="color:var(--blue)">5-7 PM</div>
+          <div class="metric-label" style="font-size:11px">Peak Hours</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════ TAXES TAB ════════ -->
+    <div class="tab-content" id="tab-taxes">
+      <div class="section-header">
+        <div class="section-title">Tax Center</div>
+        <span class="card-badge badge-yellow">Q3 2026</span>
+      </div>
+
+      <div class="tax-summary">
+        <div class="tax-item">
+          <div class="tax-item-label">YTD Gross Income</div>
+          <div class="tax-item-value" style="color:var(--green)">$38,420</div>
+        </div>
+        <div class="tax-item">
+          <div class="tax-item-label">YTD Deductions</div>
+          <div class="tax-item-value" style="color:var(--blue)">$12,847</div>
+        </div>
+        <div class="tax-item">
+          <div class="tax-item-label">Taxable Income</div>
+          <div class="tax-item-value" style="color:var(--yellow)">$25,573</div>
+        </div>
+        <div class="tax-item">
+          <div class="tax-item-label">Est. Tax Owed</div>
+          <div class="tax-item-value" style="color:var(--red)">$6,393</div>
+        </div>
+      </div>
+
+      <div class="section-header">
+        <div class="section-title">Quarterly Payments</div>
+      </div>
+
+      <div class="quarterly-timeline">
+        <div class="q-item paid">
+          <div class="q-label">Q1</div>
+          <div class="q-amount" style="color:var(--green)">$1,480</div>
+          <div class="q-status">Paid</div>
+        </div>
+        <div class="q-item paid">
+          <div class="q-label">Q2</div>
+          <div class="q-amount" style="color:var(--green)">$1,598</div>
+          <div class="q-status">Paid</div>
+        </div>
+        <div class="q-item active">
+          <div class="q-label">Q3</div>
+          <div class="q-amount" style="color:var(--yellow)">$1,650</div>
+          <div class="q-status">Due Sep 15</div>
+        </div>
+        <div class="q-item">
+          <div class="q-label">Q4</div>
+          <div class="q-amount" style="color:var(--text-dim)">$1,665</div>
+          <div class="q-status" style="color:var(--text-dim)">Jan 15</div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="section-header">
+        <div class="section-title">Deductions Breakdown</div>
+      </div>
+
+      <div class="card">
+        <div class="chart-container">
+          <canvas id="deductionsChart"></canvas>
+        </div>
+      </div>
+
+      <div class="deduction-list">
+        <div class="deduction-row">
+          <div class="deduction-left">
+            <div class="deduction-icon" style="background:var(--blue-dim)">🚗</div>
+            <div class="deduction-name">Mileage (14,230 mi)</div>
+          </div>
+          <div class="deduction-amount">$9,350</div>
+        </div>
+        <div class="deduction-row">
+          <div class="deduction-left">
+            <div class="deduction-icon" style="background:var(--yellow-dim)">⛽</div>
+            <div class="deduction-name">Fuel</div>
+          </div>
+          <div class="deduction-amount">$1,847</div>
+        </div>
+        <div class="deduction-row">
+          <div class="deduction-left">
+            <div class="deduction-icon" style="background:var(--green-dim)">📱</div>
+            <div class="deduction-name">Phone & Data</div>
+          </div>
+          <div class="deduction-amount">$630</div>
+        </div>
+        <div class="deduction-row">
+          <div class="deduction-left">
+            <div class="deduction-icon" style="background:var(--red-dim)">🔧</div>
+            <div class="deduction-name">Repairs & Maintenance</div>
+          </div>
+          <div class="deduction-amount">$520</div>
+        </div>
+        <div class="deduction-row">
+          <div class="deduction-left">
+            <div class="deduction-icon" style="background:var(--blue-dim)">🛡️</div>
+            <div class="deduction-name">Insurance</div>
+          </div>
+          <div class="deduction-amount">$310</div>
+        </div>
+        <div class="deduction-row">
+          <div class="deduction-left">
+            <div class="deduction-icon" style="background:var(--yellow-dim)">🧽</div>
+            <div class="deduction-name">Car Washes</div>
+          </div>
+          <div class="deduction-amount">$96</div>
+        </div>
+        <div class="deduction-row">
+          <div class="deduction-left">
+            <div class="deduction-icon" style="background:var(--green-dim)">🅿️</div>
+            <div class="deduction-name">Parking & Tolls</div>
+          </div>
+          <div class="deduction-amount">$94</div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="card" style="text-align:center;padding:24px">
+        <div style="font-size:14px;color:var(--text-secondary);margin-bottom:12px">Export your tax reports</div>
+        <button style="padding:12px 28px;border-radius:var(--radius-sm);background:var(--blue);color:var(--bg-primary);border:none;font-weight:700;font-size:14px;cursor:pointer" onclick="showToast('Tax report exported (demo)')">Export CPA Report</button>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Maintenance Center -->
+      <div class="section-header">
+        <div class="section-title">Maintenance Center</div>
+      </div>
+
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+          <div>
+            <div style="font-size:13px;color:var(--text-secondary)">Vehicle</div>
+            <div style="font-size:16px;font-weight:700">2021 Toyota Camry</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:13px;color:var(--text-secondary)">Odometer</div>
+            <div style="font-size:16px;font-weight:700;color:var(--blue)">47,832 mi</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="maint-list">
+        <div class="maint-item">
+          <div class="maint-status-icon urgent">🛢️</div>
+          <div class="maint-info">
+            <div class="maint-name">Oil Change</div>
+            <div class="maint-due">Overdue by 320 miles</div>
+          </div>
+          <div class="maint-miles urgent">OVERDUE</div>
+        </div>
+        <div class="maint-item">
+          <div class="maint-status-icon warning">🔄</div>
+          <div class="maint-info">
+            <div class="maint-name">Tire Rotation</div>
+            <div class="maint-due">Due in 1,200 miles</div>
+          </div>
+          <div class="maint-miles warning">1,200 mi</div>
+        </div>
+        <div class="maint-item">
+          <div class="maint-status-icon good">🛞</div>
+          <div class="maint-info">
+            <div class="maint-name">Brake Pads</div>
+            <div class="maint-due">~8,000 miles remaining</div>
+          </div>
+          <div class="maint-miles good">8,000 mi</div>
+        </div>
+        <div class="maint-item">
+          <div class="maint-status-icon good">🔋</div>
+          <div class="maint-info">
+            <div class="maint-name">Battery</div>
+            <div class="maint-due">Replaced 6 months ago</div>
+          </div>
+          <div class="maint-miles good">Good</div>
+        </div>
+        <div class="maint-item">
+          <div class="maint-status-icon good">⚙️</div>
+          <div class="maint-info">
+            <div class="maint-name">Transmission</div>
+            <div class="maint-due">Next at 60,000 miles</div>
+          </div>
+          <div class="maint-miles good">12,168 mi</div>
+        </div>
+        <div class="maint-item">
+          <div class="maint-status-icon warning">📋</div>
+          <div class="maint-info">
+            <div class="maint-name">Registration</div>
+            <div class="maint-due">Expires Oct 2026</div>
+          </div>
+          <div class="maint-miles warning">3 mo</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════ PROFILE TAB ════════ -->
+    <div class="tab-content" id="tab-profile">
+      <div class="profile-header">
+        <div class="profile-avatar">BW</div>
+        <div>
+          <div class="profile-name">Beau Wilson</div>
+          <div class="profile-since">Member since Jan 2025</div>
+        </div>
+      </div>
+
+      <div class="profile-stats">
+        <div class="profile-stat">
+          <div class="profile-stat-value">$38.4K</div>
+          <div class="profile-stat-label">YTD Earned</div>
+        </div>
+        <div class="profile-stat">
+          <div class="profile-stat-value">14,230</div>
+          <div class="profile-stat-label">Total Miles</div>
+        </div>
+        <div class="profile-stat">
+          <div class="profile-stat-value">847</div>
+          <div class="profile-stat-label">Driver Score</div>
+        </div>
+      </div>
+
+      <!-- Driver Score Detail -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Driver Score Breakdown</div>
+          <span class="card-badge badge-green">847 / 1000</span>
+        </div>
+        <div class="score-breakdown">
+          <div class="score-row">
+            <div class="score-row-label">Profitability</div>
+            <div class="score-row-bar"><div class="score-row-fill" style="width:92%;background:var(--green)"></div></div>
+            <div class="score-row-value" style="color:var(--green)">92</div>
+          </div>
+          <div class="score-row">
+            <div class="score-row-label">Strategy</div>
+            <div class="score-row-bar"><div class="score-row-fill" style="width:88%;background:var(--blue)"></div></div>
+            <div class="score-row-value" style="color:var(--blue)">88</div>
+          </div>
+          <div class="score-row">
+            <div class="score-row-label">Fuel Efficiency</div>
+            <div class="score-row-bar"><div class="score-row-fill" style="width:79%;background:var(--yellow)"></div></div>
+            <div class="score-row-value" style="color:var(--yellow)">79</div>
+          </div>
+          <div class="score-row">
+            <div class="score-row-label">Ratings</div>
+            <div class="score-row-bar"><div class="score-row-fill" style="width:95%;background:var(--green)"></div></div>
+            <div class="score-row-value" style="color:var(--green)">95</div>
+          </div>
+          <div class="score-row">
+            <div class="score-row-label">Maintenance</div>
+            <div class="score-row-bar"><div class="score-row-fill" style="width:72%;background:var(--orange)"></div></div>
+            <div class="score-row-value" style="color:var(--orange)">72</div>
+          </div>
+          <div class="score-row">
+            <div class="score-row-label">Safety</div>
+            <div class="score-row-bar"><div class="score-row-fill" style="width:91%;background:var(--green)"></div></div>
+            <div class="score-row-value" style="color:var(--green)">91</div>
+          </div>
+          <div class="score-row">
+            <div class="score-row-label">Driving</div>
+            <div class="score-row-bar"><div class="score-row-fill" style="width:85%;background:var(--blue)"></div></div>
+            <div class="score-row-value" style="color:var(--blue)">85</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Badges -->
+      <div class="section-header">
+        <div class="section-title">Achievements</div>
+        <span class="card-badge badge-blue">7 / 12</span>
+      </div>
+
+      <div class="badge-grid">
+        <div class="badge-item earned">
+          <div class="badge-emoji">🛣️</div>
+          <div class="badge-name">Road Warrior</div>
+          <div class="badge-progress" style="color:var(--green)">1,000 mi</div>
+        </div>
+        <div class="badge-item earned">
+          <div class="badge-emoji">💰</div>
+          <div class="badge-name">$10K Club</div>
+          <div class="badge-progress" style="color:var(--green)">Earned</div>
+        </div>
+        <div class="badge-item earned">
+          <div class="badge-emoji">⭐</div>
+          <div class="badge-name">Five Star Month</div>
+          <div class="badge-progress" style="color:var(--green)">Mar 2026</div>
+        </div>
+        <div class="badge-item earned">
+          <div class="badge-emoji">🔧</div>
+          <div class="badge-name">Well Oiled</div>
+          <div class="badge-progress" style="color:var(--green)">100%</div>
+        </div>
+        <div class="badge-item earned">
+          <div class="badge-emoji">📈</div>
+          <div class="badge-name">Top 10%</div>
+          <div class="badge-progress" style="color:var(--green)">Profitability</div>
+        </div>
+        <div class="badge-item earned">
+          <div class="badge-emoji">🌅</div>
+          <div class="badge-name">Early Bird</div>
+          <div class="badge-progress" style="color:var(--green)">50 AM shifts</div>
+        </div>
+        <div class="badge-item earned">
+          <div class="badge-emoji">🎯</div>
+          <div class="badge-name">Smart Picker</div>
+          <div class="badge-progress" style="color:var(--green)">90% accept rate</div>
+        </div>
+        <div class="badge-item locked">
+          <div class="badge-emoji">🏆</div>
+          <div class="badge-name">$50K Club</div>
+          <div class="badge-progress">$38.4K / $50K</div>
+        </div>
+        <div class="badge-item locked">
+          <div class="badge-emoji">🚀</div>
+          <div class="badge-name">Speed Demon</div>
+          <div class="badge-progress">20K mi needed</div>
+        </div>
+        <div class="badge-item locked">
+          <div class="badge-emoji">🌙</div>
+          <div class="badge-name">Night Owl</div>
+          <div class="badge-progress">18 / 30 shifts</div>
+        </div>
+        <div class="badge-item locked">
+          <div class="badge-emoji">💎</div>
+          <div class="badge-name">Diamond Driver</div>
+          <div class="badge-progress">Score 950+</div>
+        </div>
+        <div class="badge-item locked">
+          <div class="badge-emoji">🤝</div>
+          <div class="badge-name">Multi-Apper</div>
+          <div class="badge-progress">4 / 5 apps</div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Settings -->
+      <div class="section-header">
+        <div class="section-title">Settings</div>
+      </div>
+
+      <div class="settings-list">
+        <div class="settings-item" onclick="showToast('Connected Apps settings')">
+          <div class="settings-left">
+            <div class="settings-icon">🔗</div>
+            <div class="settings-label">Connected Apps</div>
+          </div>
+          <div class="settings-chevron">›</div>
+        </div>
+        <div class="settings-item" onclick="showToast('Vehicle settings')">
+          <div class="settings-left">
+            <div class="settings-icon">🚘</div>
+            <div class="settings-label">Vehicle Profile</div>
+          </div>
+          <div class="settings-chevron">›</div>
+        </div>
+        <div class="settings-item" onclick="showToast('Notification preferences')">
+          <div class="settings-left">
+            <div class="settings-icon">🔔</div>
+            <div class="settings-label">Notifications</div>
+          </div>
+          <div class="settings-chevron">›</div>
+        </div>
+        <div class="settings-item" onclick="showToast('Tax preferences')">
+          <div class="settings-left">
+            <div class="settings-icon">📊</div>
+            <div class="settings-label">Tax Preferences</div>
+          </div>
+          <div class="settings-chevron">›</div>
+        </div>
+        <div class="settings-item">
+          <div class="settings-left">
+            <div class="settings-icon">🎙️</div>
+            <div class="settings-label">Voice Assistant</div>
+          </div>
+          <div class="toggle active" onclick="event.stopPropagation();this.classList.toggle('active')"></div>
+        </div>
+        <div class="settings-item">
+          <div class="settings-left">
+            <div class="settings-icon">📍</div>
+            <div class="settings-label">Auto Mileage</div>
+          </div>
+          <div class="toggle active" onclick="event.stopPropagation();this.classList.toggle('active')"></div>
+        </div>
+        <div class="settings-item" onclick="showToast('Premium features')">
+          <div class="settings-left">
+            <div class="settings-icon">👑</div>
+            <div class="settings-label">RideForge Premium</div>
+          </div>
+          <div class="settings-chevron">›</div>
+        </div>
+        <div class="settings-item" onclick="showToast('Help & Support')">
+          <div class="settings-left">
+            <div class="settings-icon">❓</div>
+            <div class="settings-label">Help & Support</div>
+          </div>
+          <div class="settings-chevron">›</div>
+        </div>
+      </div>
+
+      <div style="text-align:center;padding:20px;font-size:12px;color:var(--text-dim)">
+        RideForge v2.1.0 — Demo Mode
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Voice Assistant Button -->
+  <button class="voice-btn" id="voiceBtn" onclick="toggleVoice()">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/>
+      <path d="M19 10v2a7 7 0 01-14 0v-2"/>
+      <line x1="12" y1="19" x2="12" y2="23"/>
+      <line x1="8" y1="23" x2="16" y2="23"/>
+    </svg>
+  </button>
+
+  <!-- Bottom Navigation -->
+  <nav class="bottom-nav">
+    <button class="nav-item active" data-tab="home" onclick="switchTab('home')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+      Home
+    </button>
+    <button class="nav-item" data-tab="map" onclick="switchTab('map')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1,6 1,22 8,18 16,22 23,18 23,2 16,6 8,2"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+      Map
+    </button>
+    <button class="nav-item" data-tab="earnings" onclick="switchTab('earnings')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+      Earnings
+    </button>
+    <button class="nav-item" data-tab="taxes" onclick="switchTab('taxes')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10,9 9,9 8,9"/></svg>
+      Taxes
+    </button>
+    <button class="nav-item" data-tab="profile" onclick="switchTab('profile')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      Profile
+    </button>
+  </nav>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+(function() {
+  'use strict';
+
+  // ─── Tab Switching ───
+  window.switchTab = function(tab) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('tab-' + tab).classList.add('active');
+    document.querySelector('[data-tab="' + tab + '"]').classList.add('active');
+    document.querySelector('.content').scrollTop = 0;
+
+    if (tab === 'map') drawMap();
+    if (tab === 'earnings') { drawEarningsChart(); drawHourlyChart(); drawCostPerMileChart(); drawBestDaysChart(); }
+    if (tab === 'taxes') drawDeductionsChart();
+    if (tab === 'home') drawScoreRing();
+  };
+
+  // ─── Toast ───
+  window.showToast = function(msg) {
+    var t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(function() { t.classList.remove('show'); }, 2500);
+  };
+
+  // ─── Shift Toggle ───
+  var shiftActive = false;
+  window.toggleShift = function() {
+    shiftActive = !shiftActive;
+    var btn = document.getElementById('shiftBtn');
+    if (shiftActive) {
+      btn.className = 'shift-btn stop';
+      btn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="16" height="16" rx="2"/></svg> END SHIFT';
+      showToast('Shift started — tracking mileage');
+    } else {
+      btn.className = 'shift-btn start';
+      btn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg> START SHIFT';
+      showToast('Shift ended — 6.3 hours logged');
+    }
+  };
+
+  // ─── Voice Toggle ───
+  var voiceActive = false;
+  window.toggleVoice = function() {
+    voiceActive = !voiceActive;
+    var btn = document.getElementById('voiceBtn');
+    if (voiceActive) {
+      btn.classList.add('listening');
+      showToast('Listening... "Show today\'s earnings"');
+      setTimeout(function() {
+        btn.classList.remove('listening');
+        voiceActive = false;
+        showToast('Today you earned $187.42 gross');
+      }, 3000);
+    }
+  };
+
+  // ─── Chart Tab Switching ───
+  document.getElementById('earningsChartTabs').addEventListener('click', function(e) {
+    if (e.target.classList.contains('chart-tab')) {
+      this.querySelectorAll('.chart-tab').forEach(function(t) { t.classList.remove('active'); });
+      e.target.classList.add('active');
+      drawEarningsChart(e.target.dataset.period);
+    }
+  });
+
+  // ─── Drawing Helpers ───
+  function getCtx(id, w, h) {
+    var canvas = document.getElementById(id);
+    if (!canvas) return null;
+    var dpr = window.devicePixelRatio || 1;
+    var rect = canvas.parentElement.getBoundingClientRect();
+    w = w || rect.width;
+    h = h || rect.height;
+    canvas.width = w * dpr;
+    canvas.height = h * dpr;
+    canvas.style.width = w + 'px';
+    canvas.style.height = h + 'px';
+    var ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+    ctx.W = w;
+    ctx.H = h;
+    return ctx;
+  }
+
+  // ─── Score Ring ───
+  window.drawScoreRing = function() {
+    var ctx = getCtx('scoreCanvas', 200, 200);
+    if (!ctx) return;
+    var cx = 100, cy = 100, r = 80, lw = 12;
+    var score = 847, max = 1000, pct = score / max;
+
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.strokeStyle = '#1e2d4a';
+    ctx.lineWidth = lw;
+    ctx.stroke();
+
+    var start = -Math.PI / 2;
+    var end = start + Math.PI * 2 * pct;
+    var grad = ctx.createLinearGradient(0, 0, 200, 200);
+    grad.addColorStop(0, '#00d4ff');
+    grad.addColorStop(1, '#00ff88');
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, start, end);
+    ctx.strokeStyle = grad;
+    ctx.lineWidth = lw;
+    ctx.lineCap = 'round';
+    ctx.stroke();
+  };
+
+  // ─── Map ───
+  window.drawMap = function() {
+    var ctx = getCtx('mapCanvas');
+    if (!ctx) return;
+    var w = ctx.W, h = ctx.H;
+
+    var bgGrad = ctx.createLinearGradient(0, 0, 0, h);
+    bgGrad.addColorStop(0, '#0d1520');
+    bgGrad.addColorStop(1, '#111d2e');
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(0, 0, w, h);
+
+    ctx.strokeStyle = '#1a2a40';
+    ctx.lineWidth = 1;
+    for (var i = 0; i < 20; i++) {
+      var x = (Math.sin(i * 0.8) * 0.5 + 0.5) * w;
+      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x + (i % 3 - 1) * 40, h); ctx.stroke();
+    }
+    for (var j = 0; j < 15; j++) {
+      var y = (Math.cos(j * 0.7) * 0.5 + 0.5) * h;
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y + (j % 3 - 1) * 30); ctx.stroke();
+    }
+
+    ctx.strokeStyle = '#2a3a55';
+    ctx.lineWidth = 2;
+    var roads = [
+      [[0, h * 0.3], [w * 0.3, h * 0.35], [w * 0.6, h * 0.25], [w, h * 0.3]],
+      [[0, h * 0.6], [w * 0.4, h * 0.55], [w * 0.7, h * 0.65], [w, h * 0.6]],
+      [[w * 0.2, 0], [w * 0.25, h * 0.4], [w * 0.3, h]],
+      [[w * 0.5, 0], [w * 0.55, h * 0.5], [w * 0.5, h]],
+      [[w * 0.8, 0], [w * 0.75, h * 0.3], [w * 0.8, h * 0.7], [w * 0.85, h]]
+    ];
+    roads.forEach(function(pts) {
+      ctx.beginPath();
+      ctx.moveTo(pts[0][0], pts[0][1]);
+      for (var k = 1; k < pts.length; k++) ctx.lineTo(pts[k][0], pts[k][1]);
+      ctx.stroke();
+    });
+
+    function drawZone(x, y, r, color) {
+      var g = ctx.createRadialGradient(x, y, 0, x, y, r);
+      g.addColorStop(0, color.replace(')', ',0.35)').replace('rgb', 'rgba'));
+      g.addColorStop(1, color.replace(')', ',0)').replace('rgb', 'rgba'));
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+    }
+
+    drawZone(w * 0.3, h * 0.35, 50, 'rgb(255,68,102)');
+    drawZone(w * 0.55, h * 0.5, 40, 'rgb(255,68,102)');
+    drawZone(w * 0.7, h * 0.3, 35, 'rgb(255,187,51)');
+    drawZone(w * 0.2, h * 0.6, 45, 'rgb(0,255,136)');
+    drawZone(w * 0.8, h * 0.65, 30, 'rgb(170,102,255)');
+
+    function drawMarker(x, y, color, label) {
+      ctx.fillStyle = color;
+      ctx.beginPath(); ctx.arc(x, y, 6, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = 'rgba(255,255,255,0.9)';
+      ctx.beginPath(); ctx.arc(x, y, 3, 0, Math.PI * 2); ctx.fill();
+      if (label) {
+        ctx.fillStyle = 'rgba(255,255,255,0.8)';
+        ctx.font = '600 10px -apple-system,sans-serif';
+        ctx.fillText(label, x + 10, y + 4);
+      }
+    }
+
+    drawMarker(w * 0.3, h * 0.35, '#ff4466', '2.1x Surge');
+    drawMarker(w * 0.55, h * 0.5, '#ff4466', '1.8x');
+    drawMarker(w * 0.7, h * 0.3, '#ffbb33', 'Hotspot');
+    drawMarker(w * 0.2, h * 0.6, '#00ff88', 'Airport');
+    drawMarker(w * 0.8, h * 0.65, '#aa66ff', 'Concert');
+
+    ctx.fillStyle = '#00d4ff';
+    ctx.beginPath(); ctx.arc(w * 0.45, h * 0.48, 8, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#0a0e17';
+    ctx.beginPath(); ctx.arc(w * 0.45, h * 0.48, 4, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = 'rgba(0,212,255,0.3)';
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(w * 0.45, h * 0.48, 16, 0, Math.PI * 2); ctx.stroke();
+  };
+
+  // ─── Earnings Chart ───
+  window.drawEarningsChart = function(period) {
+    var ctx = getCtx('earningsChart');
+    if (!ctx) return;
+    var w = ctx.W, h = ctx.H;
+    var pad = { t: 20, r: 10, b: 30, l: 50 };
+
+    var datasets = {
+      daily: { labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'], data: [142, 168, 127, 195, 238, 210, 187] },
+      weekly: { labels: ['W1','W2','W3','W4'], data: [980, 1120, 1050, 1248] },
+      monthly: { labels: ['Jan','Feb','Mar','Apr','May','Jun','Jul'], data: [4200, 4800, 5100, 4900, 5600, 5800, 5420] }
+    };
+    period = period || 'daily';
+    var d = datasets[period];
+
+    ctx.clearRect(0, 0, w, h);
+
+    var maxVal = Math.max.apply(null, d.data) * 1.15;
+    var cw = w - pad.l - pad.r, ch = h - pad.t - pad.b;
+
+    ctx.strokeStyle = '#1e2d4a';
+    ctx.lineWidth = 1;
+    for (var g = 0; g < 5; g++) {
+      var gy = pad.t + (ch / 4) * g;
+      ctx.beginPath(); ctx.moveTo(pad.l, gy); ctx.lineTo(w - pad.r, gy); ctx.stroke();
+      ctx.fillStyle = '#556688';
+      ctx.font = '11px -apple-system,sans-serif';
+      ctx.textAlign = 'right';
+      ctx.fillText('$' + Math.round(maxVal - (maxVal / 4) * g), pad.l - 6, gy + 4);
+    }
+
+    var grad = ctx.createLinearGradient(0, pad.t, 0, h - pad.b);
+    grad.addColorStop(0, 'rgba(0,255,136,0.3)');
+    grad.addColorStop(1, 'rgba(0,255,136,0)');
+
+    var points = d.data.map(function(v, i) {
+      return {
+        x: pad.l + (cw / (d.data.length - 1)) * i,
+        y: pad.t + ch - (v / maxVal) * ch
+      };
+    });
+
+    ctx.beginPath();
+    ctx.moveTo(points[0].x, h - pad.b);
+    points.forEach(function(p) { ctx.lineTo(p.x, p.y); });
+    ctx.lineTo(points[points.length - 1].x, h - pad.b);
+    ctx.closePath();
+    ctx.fillStyle = grad;
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.moveTo(points[0].x, points[0].y);
+    points.forEach(function(p) { ctx.lineTo(p.x, p.y); });
+    ctx.strokeStyle = '#00ff88';
+    ctx.lineWidth = 2.5;
+    ctx.stroke();
+
+    points.forEach(function(p) {
+      ctx.beginPath(); ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+      ctx.fillStyle = '#00ff88'; ctx.fill();
+      ctx.beginPath(); ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
+      ctx.fillStyle = '#0a0e17'; ctx.fill();
+    });
+
+    ctx.fillStyle = '#8899bb';
+    ctx.font = '11px -apple-system,sans-serif';
+    ctx.textAlign = 'center';
+    d.labels.forEach(function(lbl, i) {
+      var x = pad.l + (cw / (d.labels.length - 1)) * i;
+      ctx.fillText(lbl, x, h - 8);
+    });
+  };
+
+  // ─── Hourly Chart ───
+  window.drawHourlyChart = function() {
+    var ctx = getCtx('hourlyChart');
+    if (!ctx) return;
+    var w = ctx.W, h = ctx.H;
+    var pad = { t: 15, r: 10, b: 30, l: 50 };
+
+    var hours = ['6a','8a','10a','12p','2p','4p','6p','8p','10p'];
+    var data = [18, 22, 25, 28, 24, 32, 38, 35, 27];
+    var maxVal = 45;
+    var cw = w - pad.l - pad.r, ch = h - pad.t - pad.b;
+
+    ctx.clearRect(0, 0, w, h);
+
+    ctx.strokeStyle = '#1e2d4a';
+    ctx.lineWidth = 1;
+    for (var g = 0; g < 4; g++) {
+      var gy = pad.t + (ch / 3) * g;
+      ctx.beginPath(); ctx.moveTo(pad.l, gy); ctx.lineTo(w - pad.r, gy); ctx.stroke();
+      ctx.fillStyle = '#556688';
+      ctx.font = '11px -apple-system,sans-serif';
+      ctx.textAlign = 'right';
+      ctx.fillText('$' + Math.round(maxVal - (maxVal / 3) * g), pad.l - 6, gy + 4);
+    }
+
+    var bw = cw / data.length * 0.6;
+    var gap = cw / data.length;
+
+    data.forEach(function(v, i) {
+      var bh = (v / maxVal) * ch;
+      var x = pad.l + gap * i + (gap - bw) / 2;
+      var y = pad.t + ch - bh;
+
+      var bg = ctx.createLinearGradient(x, y, x, pad.t + ch);
+      bg.addColorStop(0, '#00d4ff');
+      bg.addColorStop(1, 'rgba(0,212,255,0.3)');
+      ctx.fillStyle = bg;
+
+      var radius = 4;
+      ctx.beginPath();
+      ctx.moveTo(x + radius, y);
+      ctx.lineTo(x + bw - radius, y);
+      ctx.quadraticCurveTo(x + bw, y, x + bw, y + radius);
+      ctx.lineTo(x + bw, pad.t + ch);
+      ctx.lineTo(x, pad.t + ch);
+      ctx.lineTo(x, y + radius);
+      ctx.quadraticCurveTo(x, y, x + radius, y);
+      ctx.fill();
+    });
+
+    ctx.fillStyle = '#8899bb';
+    ctx.font = '10px -apple-system,sans-serif';
+    ctx.textAlign = 'center';
+    hours.forEach(function(lbl, i) {
+      ctx.fillText(lbl, pad.l + gap * i + gap / 2, h - 8);
+    });
+  };
+
+  // ─── Cost Per Mile Chart ───
+  window.drawCostPerMileChart = function() {
+    var ctx = getCtx('costPerMileChart');
+    if (!ctx) return;
+    var w = ctx.W, h = ctx.H;
+    var pad = { t: 20, r: 10, b: 30, l: 50 };
+    var data = [0.62, 0.58, 0.55, 0.52, 0.51, 0.49, 0.49];
+    var labels = ['Jan','Feb','Mar','Apr','May','Jun','Jul'];
+    var maxVal = 0.7, minVal = 0.3;
+    var cw = w - pad.l - pad.r, ch = h - pad.t - pad.b;
+
+    ctx.clearRect(0, 0, w, h);
+
+    var points = data.map(function(v, i) {
+      return {
+        x: pad.l + (cw / (data.length - 1)) * i,
+        y: pad.t + ch - ((v - minVal) / (maxVal - minVal)) * ch
+      };
+    });
+
+    var grad = ctx.createLinearGradient(0, pad.t, 0, h - pad.b);
+    grad.addColorStop(0, 'rgba(0,212,255,0.25)');
+    grad.addColorStop(1, 'rgba(0,212,255,0)');
+    ctx.beginPath();
+    ctx.moveTo(points[0].x, h - pad.b);
+    points.forEach(function(p) { ctx.lineTo(p.x, p.y); });
+    ctx.lineTo(points[points.length - 1].x, h - pad.b);
+    ctx.closePath();
+    ctx.fillStyle = grad;
+    ctx.fill();
+
+    ctx.beginPath();
+    points.forEach(function(p, i) { i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y); });
+    ctx.strokeStyle = '#00d4ff';
+    ctx.lineWidth = 2.5;
+    ctx.stroke();
+
+    points.forEach(function(p) {
+      ctx.beginPath(); ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+      ctx.fillStyle = '#00d4ff'; ctx.fill();
+    });
+
+    ctx.fillStyle = '#8899bb';
+    ctx.font = '11px -apple-system,sans-serif';
+    ctx.textAlign = 'center';
+    labels.forEach(function(lbl, i) {
+      ctx.fillText(lbl, pad.l + (cw / (labels.length - 1)) * i, h - 8);
+    });
+
+    ctx.textAlign = 'right';
+    for (var g = 0; g <= 4; g++) {
+      var val = minVal + ((maxVal - minVal) / 4) * (4 - g);
+      var gy = pad.t + (ch / 4) * g;
+      ctx.fillText('$' + val.toFixed(2), pad.l - 6, gy + 4);
+      ctx.strokeStyle = '#1e2d4a'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(pad.l, gy); ctx.lineTo(w - pad.r, gy); ctx.stroke();
+    }
+  };
+
+  // ─── Best Days Bar Chart ───
+  window.drawBestDaysChart = function() {
+    var ctx = getCtx('bestDaysChart');
+    if (!ctx) return;
+    var w = ctx.W, h = ctx.H;
+    var pad = { t: 10, r: 10, b: 25, l: 40 };
+    var days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+    var data = [142, 168, 127, 195, 238, 210, 187];
+    var maxVal = 260;
+    var cw = w - pad.l - pad.r, ch = h - pad.t - pad.b;
+    var bw = cw / days.length * 0.65;
+    var gap = cw / days.length;
+
+    ctx.clearRect(0, 0, w, h);
+
+    var colors = data.map(function(v) {
+      if (v >= 220) return '#00ff88';
+      if (v >= 180) return '#00d4ff';
+      if (v >= 150) return '#ffbb33';
+      return '#556688';
+    });
+
+    data.forEach(function(v, i) {
+      var bh = (v / maxVal) * ch;
+      var x = pad.l + gap * i + (gap - bw) / 2;
+      var y = pad.t + ch - bh;
+      ctx.fillStyle = colors[i];
+      ctx.beginPath();
+      ctx.moveTo(x + 3, y); ctx.lineTo(x + bw - 3, y);
+      ctx.quadraticCurveTo(x + bw, y, x + bw, y + 3);
+      ctx.lineTo(x + bw, pad.t + ch); ctx.lineTo(x, pad.t + ch);
+      ctx.lineTo(x, y + 3); ctx.quadraticCurveTo(x, y, x + 3, y);
+      ctx.fill();
+
+      ctx.fillStyle = 'rgba(255,255,255,0.8)';
+      ctx.font = '600 10px -apple-system,sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('$' + v, x + bw / 2, y - 6);
+    });
+
+    ctx.fillStyle = '#8899bb';
+    ctx.font = '11px -apple-system,sans-serif';
+    ctx.textAlign = 'center';
+    days.forEach(function(d, i) {
+      ctx.fillText(d, pad.l + gap * i + gap / 2, h - 6);
+    });
+  };
+
+  // ─── Deductions Donut Chart ───
+  window.drawDeductionsChart = function() {
+    var ctx = getCtx('deductionsChart');
+    if (!ctx) return;
+    var w = ctx.W, h = ctx.H;
+    var cx = w / 2, cy = h / 2, r = Math.min(w, h) / 2 - 20;
+
+    var data = [
+      { label: 'Mileage', value: 9350, color: '#00d4ff' },
+      { label: 'Fuel', value: 1847, color: '#ffbb33' },
+      { label: 'Phone', value: 630, color: '#00ff88' },
+      { label: 'Repairs', value: 520, color: '#ff4466' },
+      { label: 'Insurance', value: 310, color: '#aa66ff' },
+      { label: 'Other', value: 190, color: '#556688' }
+    ];
+
+    var total = data.reduce(function(s, d) { return s + d.value; }, 0);
+    var start = -Math.PI / 2;
+
+    ctx.clearRect(0, 0, w, h);
+
+    data.forEach(function(seg) {
+      var angle = (seg.value / total) * Math.PI * 2;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.arc(cx, cy, r, start, start + angle);
+      ctx.closePath();
+      ctx.fillStyle = seg.color;
+      ctx.fill();
+      start += angle;
+    });
+
+    ctx.beginPath();
+    ctx.arc(cx, cy, r * 0.6, 0, Math.PI * 2);
+    ctx.fillStyle = '#1a2235';
+    ctx.fill();
+
+    ctx.fillStyle = '#f0f4ff';
+    ctx.font = '700 20px -apple-system,sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('$12,847', cx, cy - 2);
+    ctx.fillStyle = '#8899bb';
+    ctx.font = '12px -apple-system,sans-serif';
+    ctx.fillText('Total Deductions', cx, cy + 16);
+  };
+
+  // ─── Initial Draw ───
+  drawScoreRing();
+
+  // ─── Simulate live updates ───
+  var earnings = 187.42;
+  setInterval(function() {
+    if (!shiftActive) return;
+    var add = (Math.random() * 2 + 0.5);
+    earnings += add;
+    var el = document.getElementById('grossEarnings');
+    if (el) el.textContent = '$' + earnings.toFixed(2);
+    var net = earnings * 0.754;
+    var nel = document.getElementById('netEarnings');
+    if (nel) nel.textContent = '$' + net.toFixed(2);
+    var hel = document.getElementById('hourlyRate');
+    if (hel) hel.textContent = '$' + (earnings / 6.3).toFixed(2);
+    var tel = document.getElementById('taxAside');
+    if (tel) tel.textContent = '$' + Math.round(earnings * 0.224);
+  }, 5000);
+
+})();
+</script>
+</body>
+</html>
