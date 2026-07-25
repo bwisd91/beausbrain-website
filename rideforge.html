@@ -3,45 +3,119 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>RideForge — One Dashboard. Every Gig. Maximum Profit.</title>
+<meta name="theme-color" content="#0a0e17">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>RideForge</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔧</text></svg>">
 <style>
+/* ════════════════════════════════════════════════
+   DESIGN TOKENS
+   ════════════════════════════════════════════════ */
 :root {
-  --bg-primary: #0a0e17;
-  --bg-secondary: #111827;
-  --bg-card: #1a2235;
-  --bg-card-hover: #1f2a40;
+  --bg-0: #060a12;
+  --bg-1: #0a0e17;
+  --bg-2: #111827;
+  --bg-3: #1a2235;
+  --bg-4: #1f2a40;
+  --bg-5: #263350;
+
   --blue: #00d4ff;
-  --blue-dim: rgba(0,212,255,0.15);
+  --blue-glow: rgba(0,212,255,0.25);
+  --blue-dim: rgba(0,212,255,0.12);
+  --blue-dark: #0099bb;
+
   --green: #00ff88;
-  --green-dim: rgba(0,255,136,0.15);
+  --green-glow: rgba(0,255,136,0.25);
+  --green-dim: rgba(0,255,136,0.12);
+
   --red: #ff4466;
-  --red-dim: rgba(255,68,102,0.15);
+  --red-glow: rgba(255,68,102,0.25);
+  --red-dim: rgba(255,68,102,0.12);
+
   --yellow: #ffbb33;
-  --yellow-dim: rgba(255,187,51,0.15);
+  --yellow-dim: rgba(255,187,51,0.12);
+
   --orange: #ff8844;
   --purple: #aa66ff;
-  --text-primary: #f0f4ff;
-  --text-secondary: #8899bb;
-  --text-dim: #556688;
+  --purple-dim: rgba(170,102,255,0.12);
+  --pink: #ff66aa;
+
+  --text-1: #f0f4ff;
+  --text-2: #8899bb;
+  --text-3: #556688;
+  --text-4: #334466;
+
   --border: #1e2d4a;
-  --radius: 16px;
-  --radius-sm: 10px;
-  --shadow: 0 4px 24px rgba(0,0,0,0.4);
-  --transition: 0.25s cubic-bezier(0.4,0,0.2,1);
+  --border-light: #2a3d5c;
+
+  --r-lg: 20px;
+  --r-md: 14px;
+  --r-sm: 10px;
+  --r-xs: 6px;
+
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.3);
+  --shadow-md: 0 4px 24px rgba(0,0,0,0.4);
+  --shadow-lg: 0 8px 40px rgba(0,0,0,0.5);
+  --shadow-glow-blue: 0 0 30px rgba(0,212,255,0.15);
+  --shadow-glow-green: 0 0 30px rgba(0,255,136,0.15);
+
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --dur: 0.3s;
+  --dur-fast: 0.15s;
+  --dur-slow: 0.5s;
+
+  --nav-h: 64px;
+  --header-h: 56px;
 }
 
-* { margin:0; padding:0; box-sizing:border-box; }
+/* ════════════════════════════════════════════════
+   RESET & BASE
+   ════════════════════════════════════════════════ */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
 html, body {
   height: 100%;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, sans-serif;
-  background: var(--bg-primary);
-  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg-0);
+  color: var(--text-1);
   overflow: hidden;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
 }
 
-/* ─── App Shell ─── */
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+
+input, select, textarea {
+  font-family: inherit;
+  color: inherit;
+  background: var(--bg-3);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: 12px 14px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color var(--dur) var(--ease);
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: var(--blue);
+}
+
+/* ════════════════════════════════════════════════
+   APP SHELL
+   ════════════════════════════════════════════════ */
 .app {
   display: flex;
   flex-direction: column;
@@ -49,152 +123,198 @@ html, body {
   max-width: 480px;
   margin: 0 auto;
   position: relative;
+  background: var(--bg-1);
+  overflow: hidden;
 }
 
 @media (min-width: 768px) {
-  .app { max-width: 480px; border-left: 1px solid var(--border); border-right: 1px solid var(--border); }
+  body { background: var(--bg-0); }
+  .app {
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    box-shadow: 0 0 80px rgba(0,212,255,0.05);
+  }
 }
 
-/* ─── Header ─── */
+/* ═══ Header ═══ */
 .header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 20px;
-  background: var(--bg-secondary);
+  padding: 0 20px;
+  height: var(--header-h);
+  background: var(--bg-2);
   border-bottom: 1px solid var(--border);
-  z-index: 10;
+  z-index: 50;
   flex-shrink: 0;
 }
 
-.header-logo {
+.h-logo {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   font-size: 20px;
-  font-weight: 700;
+  font-weight: 800;
   letter-spacing: -0.5px;
 }
 
-.header-logo svg { width: 28px; height: 28px; }
-
-.header-logo .ride { color: var(--text-primary); }
-.header-logo .forge { color: var(--blue); }
-
-.header-right {
+.h-logo-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--blue), var(--green));
   display: flex;
   align-items: center;
-  gap: 14px;
+  justify-content: center;
 }
 
-.header-btn {
-  background: none;
-  border: none;
-  color: var(--text-secondary);
-  cursor: pointer;
-  padding: 4px;
-  transition: color var(--transition);
+.h-logo-icon svg { width: 18px; height: 18px; }
+
+.h-logo .t1 { color: var(--text-1); }
+.h-logo .t2 { color: var(--blue); }
+
+.h-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
-.header-btn:hover { color: var(--blue); }
+.h-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-2);
+  transition: all var(--dur) var(--ease);
+  position: relative;
+}
 
-.status-dot {
+.h-btn:hover, .h-btn:active { color: var(--blue); background: var(--blue-dim); }
+
+.h-btn .notif-dot {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--red);
+  border: 2px solid var(--bg-2);
+}
+
+.h-online {
   width: 8px;
   height: 8px;
   border-radius: 50%;
   background: var(--green);
   box-shadow: 0 0 8px var(--green);
-  animation: pulse-dot 2s infinite;
+  animation: pulse-glow 2s ease infinite;
+  margin-right: 6px;
 }
 
-@keyframes pulse-dot {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 4px var(--green); }
+  50% { box-shadow: 0 0 14px var(--green), 0 0 4px var(--green); }
 }
 
-/* ─── Content Area ─── */
+/* ═══ Content Scroll ═══ */
 .content {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  scroll-behavior: smooth;
+  overscroll-behavior-y: contain;
   -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
 }
 
 .content::-webkit-scrollbar { width: 0; }
 
-.tab-content {
+/* ═══ Tab Panels ═══ */
+.panel {
   display: none;
-  padding: 16px 16px 100px;
-  animation: fadeIn 0.3s ease;
+  padding: 16px;
+  padding-bottom: calc(var(--nav-h) + 40px);
+  min-height: 100%;
 }
 
-.tab-content.active { display: block; }
+.panel.active {
+  display: block;
+  animation: panel-in var(--dur) var(--ease-out);
+}
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
+@keyframes panel-in {
+  from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* ─── Bottom Navigation ─── */
-.bottom-nav {
+/* ═══ Bottom Nav ═══ */
+.bnav {
   display: flex;
-  justify-content: space-around;
   align-items: center;
-  padding: 8px 0 max(8px, env(safe-area-inset-bottom));
-  background: var(--bg-secondary);
+  height: var(--nav-h);
+  padding: 0 8px;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  background: var(--bg-2);
   border-top: 1px solid var(--border);
   flex-shrink: 0;
-  z-index: 20;
+  z-index: 50;
 }
 
-.nav-item {
+.bnav-item {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 3px;
-  padding: 6px 12px;
-  background: none;
-  border: none;
-  color: var(--text-dim);
+  padding: 6px 0;
+  color: var(--text-3);
   font-size: 10px;
   font-weight: 600;
-  cursor: pointer;
-  transition: all var(--transition);
+  letter-spacing: 0.3px;
+  transition: all var(--dur) var(--ease);
   position: relative;
 }
 
-.nav-item svg { width: 22px; height: 22px; transition: all var(--transition); }
+.bnav-item svg { width: 24px; height: 24px; transition: transform var(--dur) var(--ease-bounce); }
 
-.nav-item.active {
-  color: var(--blue);
-}
+.bnav-item.active { color: var(--blue); }
+.bnav-item.active svg { transform: scale(1.1); }
 
-.nav-item.active::before {
+.bnav-item.active::after {
   content: '';
   position: absolute;
-  top: -8px;
+  top: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: 24px;
+  width: 32px;
   height: 3px;
-  border-radius: 2px;
+  border-radius: 0 0 3px 3px;
   background: var(--blue);
+  box-shadow: 0 2px 8px var(--blue-glow);
 }
+
+/* ════════════════════════════════════════════════
+   SHARED COMPONENTS
+   ════════════════════════════════════════════════ */
 
 /* ─── Cards ─── */
 .card {
-  background: var(--bg-card);
-  border-radius: var(--radius);
+  background: var(--bg-3);
+  border-radius: var(--r-lg);
   padding: 20px;
   margin-bottom: 14px;
   border: 1px solid var(--border);
-  transition: all var(--transition);
+  transition: all var(--dur) var(--ease);
 }
 
-.card:hover { border-color: rgba(0,212,255,0.2); }
+.card:active { transform: scale(0.985); }
 
-.card-header {
+.card-glow-blue { box-shadow: var(--shadow-glow-blue); border-color: rgba(0,212,255,0.25); }
+.card-glow-green { box-shadow: var(--shadow-glow-green); border-color: rgba(0,255,136,0.25); }
+
+.card-hd {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -202,60 +322,128 @@ html, body {
 }
 
 .card-title {
-  font-size: 14px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-2);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+/* ─── Badges / Pills ─── */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+
+.pill-green { background: var(--green-dim); color: var(--green); }
+.pill-blue { background: var(--blue-dim); color: var(--blue); }
+.pill-red { background: var(--red-dim); color: var(--red); }
+.pill-yellow { background: var(--yellow-dim); color: var(--yellow); }
+.pill-purple { background: var(--purple-dim); color: var(--purple); }
+
+/* ─── Section Headers ─── */
+.sh {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 20px 0 12px;
+}
+
+.sh:first-child { margin-top: 4px; }
+
+.sh-title {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+
+.sh-link {
+  font-size: 13px;
+  color: var(--blue);
   font-weight: 600;
-  color: var(--text-secondary);
+}
+
+/* ─── Metrics ─── */
+.met-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.met {
+  background: var(--bg-2);
+  border-radius: var(--r-md);
+  padding: 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+.met-val {
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 1.1;
+  margin-bottom: 4px;
+  font-variant-numeric: tabular-nums;
+}
+
+.met-lbl {
+  font-size: 11px;
+  color: var(--text-2);
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
-.card-badge {
+.met-chg {
   font-size: 11px;
-  padding: 3px 10px;
-  border-radius: 20px;
-  font-weight: 600;
-}
-
-.badge-green { background: var(--green-dim); color: var(--green); }
-.badge-yellow { background: var(--yellow-dim); color: var(--yellow); }
-.badge-red { background: var(--red-dim); color: var(--red); }
-.badge-blue { background: var(--blue-dim); color: var(--blue); }
-
-/* ─── Metrics Grid ─── */
-.metrics-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-
-.metric-card {
-  background: var(--bg-secondary);
-  border-radius: var(--radius-sm);
-  padding: 16px;
-  text-align: center;
-}
-
-.metric-value {
-  font-size: 28px;
   font-weight: 700;
-  line-height: 1.1;
-  margin-bottom: 4px;
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  gap: 3px;
 }
 
-.metric-label {
-  font-size: 12px;
-  color: var(--text-secondary);
-  font-weight: 500;
+.met-chg.up { color: var(--green); }
+.met-chg.down { color: var(--red); }
+
+.met-spark {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 60px;
+  height: 30px;
+  opacity: 0.4;
 }
 
-.metric-change {
-  font-size: 11px;
-  margin-top: 4px;
-  font-weight: 600;
+/* ─── Divider ─── */
+.divider { height: 1px; background: var(--border); margin: 20px 0; }
+
+/* ─── Buttons ─── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 24px;
+  border-radius: var(--r-md);
+  font-size: 15px;
+  font-weight: 700;
+  transition: all var(--dur) var(--ease);
 }
 
-.change-up { color: var(--green); }
-.change-down { color: var(--red); }
+.btn:active { transform: scale(0.97); }
+.btn-full { width: 100%; }
+
+.btn-primary { background: linear-gradient(135deg, var(--blue), var(--blue-dark)); color: var(--bg-1); }
+.btn-success { background: linear-gradient(135deg, var(--green), #00cc6a); color: var(--bg-1); }
+.btn-danger { background: linear-gradient(135deg, var(--red), #cc3355); color: white; }
+.btn-outline { border: 1.5px solid var(--border); color: var(--text-2); }
+.btn-outline:hover { border-color: var(--blue); color: var(--blue); }
 
 /* ─── Status Bar ─── */
 .status-bar {
@@ -263,120 +451,345 @@ html, body {
   align-items: center;
   gap: 12px;
   padding: 14px 18px;
-  border-radius: var(--radius-sm);
+  border-radius: var(--r-md);
   margin-bottom: 14px;
 }
 
-.status-bar.excellent { background: var(--green-dim); border: 1px solid rgba(0,255,136,0.3); }
-.status-bar.average { background: var(--yellow-dim); border: 1px solid rgba(255,187,51,0.3); }
-.status-bar.slow { background: var(--red-dim); border: 1px solid rgba(255,68,102,0.3); }
-
-.status-indicator {
-  width: 12px;
-  height: 12px;
+.status-bar .dot {
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
+  flex-shrink: 0;
+  animation: pulse-glow 2s ease infinite;
+}
+
+.status-bar .text { font-size: 14px; font-weight: 600; }
+
+.sb-excellent { background: var(--green-dim); border: 1px solid rgba(0,255,136,0.25); }
+.sb-excellent .dot { background: var(--green); box-shadow: 0 0 10px var(--green); }
+.sb-excellent .text { color: var(--green); }
+
+.sb-average { background: var(--yellow-dim); border: 1px solid rgba(255,187,51,0.25); }
+.sb-average .dot { background: var(--yellow); box-shadow: 0 0 10px var(--yellow); }
+.sb-average .text { color: var(--yellow); }
+
+.sb-slow { background: var(--red-dim); border: 1px solid rgba(255,68,102,0.25); }
+.sb-slow .dot { background: var(--red); box-shadow: 0 0 10px var(--red); }
+.sb-slow .text { color: var(--red); }
+
+/* ─── Chart Container ─── */
+.chart-wrap {
+  position: relative;
+  width: 100%;
+  height: 200px;
+}
+
+.chart-wrap canvas { width: 100% !important; height: 100% !important; }
+
+/* ─── Chart Tabs ─── */
+.ctabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.ctab {
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-3);
+  border: 1px solid var(--border);
+  transition: all var(--dur) var(--ease);
+}
+
+.ctab.active {
+  background: var(--blue-dim);
+  color: var(--blue);
+  border-color: rgba(0,212,255,0.3);
+}
+
+/* ─── Toggle Switch ─── */
+.sw {
+  width: 46px;
+  height: 26px;
+  border-radius: 13px;
+  background: var(--text-3);
+  position: relative;
+  cursor: pointer;
+  transition: background var(--dur) var(--ease);
   flex-shrink: 0;
 }
 
-.status-bar.excellent .status-indicator { background: var(--green); box-shadow: 0 0 10px var(--green); }
-.status-bar.average .status-indicator { background: var(--yellow); box-shadow: 0 0 10px var(--yellow); }
-.status-bar.slow .status-indicator { background: var(--red); box-shadow: 0 0 10px var(--red); }
+.sw.on { background: var(--blue); }
 
-.status-text {
+.sw::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: white;
+  transition: transform var(--dur) var(--ease-bounce);
+  box-shadow: var(--shadow-sm);
+}
+
+.sw.on::after { transform: translateX(20px); }
+
+/* ─── Progress Bar ─── */
+.pbar {
+  height: 6px;
+  background: var(--bg-2);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.pbar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 1s var(--ease);
+}
+
+/* ─── Skeleton Loader ─── */
+@keyframes shimmer {
+  0% { background-position: -200px 0; }
+  100% { background-position: 200px 0; }
+}
+
+/* ─── Toast ─── */
+.toast {
+  position: fixed;
+  top: -80px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg-3);
+  border: 1px solid var(--border);
+  padding: 12px 22px;
+  border-radius: var(--r-md);
   font-size: 14px;
   font-weight: 600;
-}
-
-.status-bar.excellent .status-text { color: var(--green); }
-.status-bar.average .status-text { color: var(--yellow); }
-.status-bar.slow .status-text { color: var(--red); }
-
-/* ─── Section Headers ─── */
-.section-header {
+  z-index: 200;
+  transition: top 0.4s var(--ease-bounce);
+  box-shadow: var(--shadow-lg);
+  white-space: nowrap;
+  max-width: 90%;
+  overflow: hidden;
+  text-overflow: ellipsis;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 14px;
-  margin-top: 8px;
+  gap: 8px;
 }
 
-.section-title {
-  font-size: 18px;
+.toast.show { top: 20px; }
+.toast .t-icon { font-size: 18px; flex-shrink: 0; }
+
+/* ─── Modal ─── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 100;
+  display: none;
+  align-items: flex-end;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+}
+
+.modal-overlay.open { display: flex; }
+
+.modal {
+  background: var(--bg-2);
+  border-radius: var(--r-lg) var(--r-lg) 0 0;
+  width: 100%;
+  max-width: 480px;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 20px;
+  animation: modal-slide-up var(--dur) var(--ease-out);
+}
+
+@keyframes modal-slide-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.modal-handle {
+  width: 40px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--text-3);
+  margin: 0 auto 16px;
+}
+
+.modal-title {
+  font-size: 20px;
   font-weight: 700;
+  margin-bottom: 16px;
 }
 
-.section-link {
-  font-size: 13px;
-  color: var(--blue);
-  background: none;
-  border: none;
-  cursor: pointer;
+/* ─── Platform Icons ─── */
+.p-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 800;
+  flex-shrink: 0;
+  color: white;
+}
+
+/* ─── Floating Action Button ─── */
+.fab {
+  position: fixed;
+  bottom: calc(var(--nav-h) + 16px);
+  right: max(16px, calc((100vw - 480px)/2 + 16px));
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--blue), #0099bb);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 20px var(--blue-glow);
+  z-index: 40;
+  transition: all var(--dur) var(--ease);
+}
+
+.fab:hover { transform: scale(1.08); }
+.fab:active { transform: scale(0.95); }
+
+.fab.listening {
+  background: linear-gradient(135deg, var(--green), #00cc6a);
+  box-shadow: 0 4px 20px var(--green-glow);
+  animation: fab-pulse 1s ease infinite;
+}
+
+@keyframes fab-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(0,255,136,0.4), 0 4px 20px var(--green-glow); }
+  50% { box-shadow: 0 0 0 14px rgba(0,255,136,0), 0 4px 20px var(--green-glow); }
+}
+
+.fab svg { width: 24px; height: 24px; }
+
+/* ════════════════════════════════════════════════
+   HOME TAB
+   ════════════════════════════════════════════════ */
+
+/* Shift Button */
+.shift-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 18px;
+  border-radius: var(--r-lg);
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+  transition: all var(--dur) var(--ease);
+  position: relative;
+  overflow: hidden;
+}
+
+.shift-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity var(--dur);
+}
+
+.shift-btn:active { transform: scale(0.97); }
+
+.shift-btn.start {
+  background: linear-gradient(135deg, var(--green), #00cc6a);
+  color: var(--bg-1);
+  box-shadow: 0 4px 20px var(--green-glow);
+}
+
+.shift-btn.stop {
+  background: linear-gradient(135deg, var(--red), #cc3355);
+  color: white;
+  box-shadow: 0 4px 20px var(--red-glow);
+}
+
+.shift-btn svg { width: 20px; height: 20px; }
+
+/* Shift Timer */
+.shift-timer {
+  display: none;
+  text-align: center;
+  margin-bottom: 14px;
+  padding: 12px;
+  background: var(--bg-3);
+  border-radius: var(--r-md);
+  border: 1px solid var(--border);
+}
+
+.shift-timer.active { display: block; }
+
+.shift-timer .timer {
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--green);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 2px;
+}
+
+.shift-timer .timer-label {
+  font-size: 11px;
+  color: var(--text-2);
   font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 2px;
 }
 
-/* ─── Platform List ─── */
-.platform-grid {
+/* ─── Platform Grid ─── */
+.plat-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
 }
 
-.platform-item {
+.plat-item {
   display: flex;
   align-items: center;
   gap: 10px;
-  background: var(--bg-secondary);
-  border-radius: var(--radius-sm);
+  background: var(--bg-2);
+  border-radius: var(--r-md);
   padding: 14px;
-  cursor: pointer;
-  transition: all var(--transition);
   border: 1px solid transparent;
+  transition: all var(--dur) var(--ease);
 }
 
-.platform-item:hover { border-color: var(--blue); }
+.plat-item:active { transform: scale(0.97); border-color: var(--blue); }
 
-.platform-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-  font-weight: 700;
-  flex-shrink: 0;
-}
-
-.platform-info {
-  min-width: 0;
-}
-
-.platform-name {
-  font-size: 13px;
-  font-weight: 600;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.platform-earnings {
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--green);
-}
+.plat-name { font-size: 12px; font-weight: 600; color: var(--text-2); }
+.plat-earn { font-size: 16px; font-weight: 800; color: var(--green); }
 
 /* ─── Dispatch Cards ─── */
-.dispatch-card {
-  background: var(--bg-card);
-  border-radius: var(--radius);
+.disp {
+  background: var(--bg-3);
+  border-radius: var(--r-lg);
   padding: 18px;
   margin-bottom: 12px;
   border: 1px solid var(--border);
   position: relative;
   overflow: hidden;
+  transition: all var(--dur) var(--ease);
 }
 
-.dispatch-card::before {
+.disp::before {
   content: '';
   position: absolute;
   left: 0;
@@ -385,91 +798,154 @@ html, body {
   width: 4px;
 }
 
-.dispatch-card.accept::before { background: var(--green); }
-.dispatch-card.decline::before { background: var(--red); }
+.disp.accept::before { background: var(--green); }
+.disp.decline::before { background: var(--red); }
 
-.dispatch-verdict {
-  display: inline-block;
-  font-size: 12px;
-  font-weight: 700;
-  padding: 3px 12px;
+.disp-verdict {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 4px 12px;
   border-radius: 20px;
   text-transform: uppercase;
   letter-spacing: 1px;
   margin-bottom: 10px;
 }
 
-.dispatch-card.accept .dispatch-verdict { background: var(--green-dim); color: var(--green); }
-.dispatch-card.decline .dispatch-verdict { background: var(--red-dim); color: var(--red); }
+.disp.accept .disp-verdict { background: var(--green-dim); color: var(--green); }
+.disp.decline .disp-verdict { background: var(--red-dim); color: var(--red); }
 
-.dispatch-details {
+.disp-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 8px;
 }
 
-.dispatch-platform {
-  font-size: 16px;
-  font-weight: 700;
-}
+.disp-platform { font-size: 16px; font-weight: 700; }
 
-.dispatch-payout {
-  font-size: 22px;
-  font-weight: 700;
-}
+.disp-payout { font-size: 24px; font-weight: 800; }
+.disp.accept .disp-payout { color: var(--green); }
+.disp.decline .disp-payout { color: var(--red); }
 
-.dispatch-card.accept .dispatch-payout { color: var(--green); }
-.dispatch-card.decline .dispatch-payout { color: var(--red); }
-
-.dispatch-meta {
+.disp-meta {
   display: flex;
-  gap: 16px;
+  gap: 14px;
   font-size: 13px;
-  color: var(--text-secondary);
+  color: var(--text-2);
   margin-bottom: 12px;
 }
 
-.profit-score-bar {
-  height: 6px;
-  background: var(--bg-secondary);
-  border-radius: 3px;
-  overflow: hidden;
-}
+.disp-meta span { display: flex; align-items: center; gap: 4px; }
 
-.profit-score-fill {
-  height: 100%;
-  border-radius: 3px;
-  transition: width 1s ease;
-}
+.disp-score { margin-top: 8px; }
 
-.dispatch-card.accept .profit-score-fill { background: var(--green); }
-.dispatch-card.decline .profit-score-fill { background: var(--red); }
-
-.profit-score-label {
+.disp-score-row {
   display: flex;
   justify-content: space-between;
   font-size: 12px;
-  margin-top: 4px;
-  color: var(--text-secondary);
+  color: var(--text-2);
+  margin-top: 6px;
 }
 
-/* ─── Map Placeholder ─── */
-.map-container {
+.disp-score-val { font-weight: 700; }
+.disp.accept .disp-score-val { color: var(--green); }
+.disp.decline .disp-score-val { color: var(--red); }
+
+.disp-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.disp-actions .btn { flex: 1; padding: 12px; font-size: 14px; }
+
+/* ─── Driver Score Ring ─── */
+.score-ring-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  margin: 16px 0;
+}
+
+.score-ring-wrap canvas { width: 180px; height: 180px; }
+
+.score-center {
+  position: absolute;
+  text-align: center;
+}
+
+.score-num {
+  font-size: 44px;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--blue), var(--green));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1;
+}
+
+.score-of {
+  font-size: 13px;
+  color: var(--text-2);
+  font-weight: 600;
+}
+
+/* ─── Score Breakdown Bars ─── */
+.sb-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.sb-lbl {
+  font-size: 12px;
+  font-weight: 600;
+  width: 90px;
+  flex-shrink: 0;
+  color: var(--text-2);
+}
+
+.sb-bar {
+  flex: 1;
+  height: 8px;
+  background: var(--bg-2);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.sb-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 1.2s var(--ease);
+}
+
+.sb-val {
+  font-size: 13px;
+  font-weight: 800;
+  width: 36px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ════════════════════════════════════════════════
+   MAP TAB
+   ════════════════════════════════════════════════ */
+.map-wrap {
   position: relative;
   width: 100%;
-  height: 300px;
-  border-radius: var(--radius);
+  height: 340px;
+  border-radius: var(--r-lg);
   overflow: hidden;
-  background: var(--bg-card);
-  border: 1px solid var(--border);
   margin-bottom: 14px;
+  border: 1px solid var(--border);
 }
 
-.map-canvas {
-  width: 100%;
-  height: 100%;
-}
+.map-wrap canvas { width: 100%; height: 100%; }
 
 .map-legend {
   position: absolute;
@@ -477,28 +953,24 @@ html, body {
   left: 12px;
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
 }
 
-.legend-item {
+.map-legend .leg {
   display: flex;
   align-items: center;
   gap: 5px;
   font-size: 10px;
-  font-weight: 600;
-  background: rgba(10,14,23,0.85);
-  padding: 4px 10px;
+  font-weight: 700;
+  background: rgba(10,14,23,0.88);
+  padding: 5px 10px;
   border-radius: 20px;
   backdrop-filter: blur(8px);
 }
 
-.legend-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-}
+.map-legend .leg-dot { width: 8px; height: 8px; border-radius: 50%; }
 
-.map-action-btns {
+.map-btns {
   position: absolute;
   top: 12px;
   right: 12px;
@@ -507,408 +979,245 @@ html, body {
   gap: 8px;
 }
 
-.map-btn {
-  width: 36px;
-  height: 36px;
+.map-btn-circ {
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
-  background: rgba(10,14,23,0.85);
+  background: rgba(10,14,23,0.88);
   border: 1px solid var(--border);
-  color: var(--text-primary);
+  color: var(--text-1);
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
   backdrop-filter: blur(8px);
-  font-size: 18px;
+  transition: all var(--dur) var(--ease);
 }
 
-/* ─── Tax Section ─── */
-.tax-summary {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-bottom: 14px;
-}
+.map-btn-circ:active { background: var(--blue-dim); color: var(--blue); }
 
-.tax-item {
-  background: var(--bg-secondary);
-  border-radius: var(--radius-sm);
-  padding: 16px;
-}
-
-.tax-item-label {
-  font-size: 12px;
-  color: var(--text-secondary);
-  margin-bottom: 6px;
-}
-
-.tax-item-value {
-  font-size: 22px;
-  font-weight: 700;
-}
-
-.deduction-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.deduction-row {
+.hotspot-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 16px;
-  background: var(--bg-secondary);
-  border-radius: var(--radius-sm);
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
 }
 
-.deduction-left {
+.hotspot-item:last-child { border-bottom: none; }
+
+.hs-name { font-size: 15px; font-weight: 700; }
+.hs-dist { font-size: 12px; color: var(--text-2); margin-top: 2px; }
+
+/* ════════════════════════════════════════════════
+   EARNINGS TAB
+   ════════════════════════════════════════════════ */
+.earn-hero {
+  text-align: center;
+  padding: 28px 20px;
+  background: var(--bg-3);
+  border-radius: var(--r-lg);
+  border: 1px solid var(--border);
+  margin-bottom: 14px;
+  position: relative;
+  overflow: hidden;
+}
+
+.earn-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 0%, var(--green-dim), transparent 60%);
+  pointer-events: none;
+}
+
+.earn-big {
+  font-size: 48px;
+  font-weight: 800;
+  color: var(--green);
+  line-height: 1;
+  margin-bottom: 6px;
+  font-variant-numeric: tabular-nums;
+  position: relative;
+}
+
+.earn-sub {
+  font-size: 14px;
+  color: var(--text-2);
+  font-weight: 500;
+  position: relative;
+}
+
+/* ─── Receipt Item ─── */
+.rcpt {
   display: flex;
   align-items: center;
-  gap: 10px;
+  justify-content: space-between;
+  padding: 14px;
+  background: var(--bg-2);
+  border-radius: var(--r-md);
+  margin-bottom: 8px;
+  transition: all var(--dur) var(--ease);
 }
 
-.deduction-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
+.rcpt:active { transform: scale(0.98); }
+
+.rcpt-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.rcpt-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  background: var(--bg-3);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
+  font-size: 20px;
 }
 
-.deduction-name {
-  font-size: 14px;
-  font-weight: 600;
-}
+.rcpt-name { font-size: 14px; font-weight: 600; }
+.rcpt-date { font-size: 11px; color: var(--text-2); margin-top: 1px; }
+.rcpt-cat { font-size: 10px; font-weight: 600; color: var(--blue); margin-top: 2px; }
+.rcpt-amt { font-size: 16px; font-weight: 700; }
 
-.deduction-amount {
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--green);
-}
-
-/* ─── Maintenance ─── */
-.maint-list {
+/* ─── Scanner ─── */
+.scanner {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  padding: 36px 20px;
+  border: 2px dashed var(--border);
+  border-radius: var(--r-lg);
+  transition: all var(--dur) var(--ease);
+  margin-bottom: 14px;
 }
 
+.scanner:active { border-color: var(--blue); background: var(--blue-dim); }
+
+.scanner-icon { font-size: 44px; margin-bottom: 10px; }
+.scanner-txt { font-size: 15px; font-weight: 700; }
+.scanner-hint { font-size: 12px; color: var(--text-2); margin-top: 2px; }
+
+/* ════════════════════════════════════════════════
+   TAXES TAB
+   ════════════════════════════════════════════════ */
+.tax-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.tax-cell {
+  background: var(--bg-2);
+  border-radius: var(--r-md);
+  padding: 16px;
+}
+
+.tax-lbl { font-size: 11px; color: var(--text-2); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+.tax-val { font-size: 22px; font-weight: 800; font-variant-numeric: tabular-nums; }
+
+/* Quarterly */
+.q-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.q-cell {
+  flex: 1;
+  text-align: center;
+  padding: 12px 4px;
+  background: var(--bg-2);
+  border-radius: var(--r-sm);
+  border: 1px solid transparent;
+}
+
+.q-cell.paid { border-color: rgba(0,255,136,0.25); }
+.q-cell.due { border-color: rgba(255,187,51,0.3); }
+
+.q-lbl { font-size: 12px; font-weight: 800; color: var(--text-2); }
+.q-amt { font-size: 15px; font-weight: 800; margin: 4px 0 2px; }
+.q-status { font-size: 10px; font-weight: 700; }
+
+/* Deduction Row */
+.ded-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px;
+  background: var(--bg-2);
+  border-radius: var(--r-md);
+  margin-bottom: 6px;
+}
+
+.ded-left { display: flex; align-items: center; gap: 12px; }
+
+.ded-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+.ded-name { font-size: 14px; font-weight: 600; }
+.ded-detail { font-size: 11px; color: var(--text-2); margin-top: 1px; }
+.ded-amt { font-size: 16px; font-weight: 800; color: var(--green); }
+
+/* ════════════════════════════════════════════════
+   MAINTENANCE
+   ════════════════════════════════════════════════ */
 .maint-item {
   display: flex;
   align-items: center;
   gap: 14px;
   padding: 14px;
-  background: var(--bg-secondary);
-  border-radius: var(--radius-sm);
+  background: var(--bg-2);
+  border-radius: var(--r-md);
+  margin-bottom: 8px;
 }
 
-.maint-status-icon {
-  width: 40px;
-  height: 40px;
+.maint-dot {
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 20px;
   flex-shrink: 0;
-  font-size: 18px;
 }
 
-.maint-status-icon.good { background: var(--green-dim); }
-.maint-status-icon.warning { background: var(--yellow-dim); }
-.maint-status-icon.urgent { background: var(--red-dim); }
+.maint-dot.ok { background: var(--green-dim); }
+.maint-dot.warn { background: var(--yellow-dim); }
+.maint-dot.bad { background: var(--red-dim); }
 
 .maint-info { flex: 1; min-width: 0; }
+.maint-name { font-size: 14px; font-weight: 700; }
+.maint-due { font-size: 12px; color: var(--text-2); margin-top: 1px; }
+.maint-stat { font-size: 13px; font-weight: 700; text-align: right; }
+.maint-stat.ok { color: var(--green); }
+.maint-stat.warn { color: var(--yellow); }
+.maint-stat.bad { color: var(--red); }
 
-.maint-name {
-  font-size: 14px;
-  font-weight: 600;
-  margin-bottom: 2px;
-}
-
-.maint-due {
-  font-size: 12px;
-  color: var(--text-secondary);
-}
-
-.maint-miles {
-  font-size: 13px;
-  font-weight: 600;
-  text-align: right;
-}
-
-.maint-miles.good { color: var(--green); }
-.maint-miles.warning { color: var(--yellow); }
-.maint-miles.urgent { color: var(--red); }
-
-/* ─── Driver Score ─── */
-.score-ring-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 20px 0;
-  position: relative;
-}
-
-.score-ring-container canvas {
-  width: 200px;
-  height: 200px;
-}
-
-.score-center {
-  position: absolute;
-  text-align: center;
-}
-
-.score-value {
-  font-size: 48px;
-  font-weight: 700;
-  color: var(--blue);
-  line-height: 1;
-}
-
-.score-max {
-  font-size: 14px;
-  color: var(--text-secondary);
-}
-
-.score-breakdown {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.score-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.score-row-label {
-  font-size: 13px;
-  font-weight: 600;
-  width: 100px;
-  flex-shrink: 0;
-}
-
-.score-row-bar {
-  flex: 1;
-  height: 8px;
-  background: var(--bg-secondary);
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-.score-row-fill {
-  height: 100%;
-  border-radius: 4px;
-  transition: width 1s ease;
-}
-
-.score-row-value {
-  font-size: 13px;
-  font-weight: 700;
-  width: 40px;
-  text-align: right;
-}
-
-/* ─── Charts ─── */
-.chart-container {
-  position: relative;
-  width: 100%;
-  height: 200px;
-  margin: 10px 0;
-}
-
-.chart-container canvas {
-  width: 100%;
-  height: 100%;
-}
-
-.chart-tabs {
-  display: flex;
-  gap: 6px;
-  margin-bottom: 14px;
-}
-
-.chart-tab {
-  padding: 7px 16px;
-  border-radius: 20px;
-  border: 1px solid var(--border);
-  background: none;
-  color: var(--text-secondary);
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all var(--transition);
-}
-
-.chart-tab.active {
-  background: var(--blue-dim);
-  color: var(--blue);
-  border-color: var(--blue);
-}
-
-/* ─── Expense Scanner ─── */
-.scanner-area {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 40px 20px;
-  border: 2px dashed var(--border);
-  border-radius: var(--radius);
-  cursor: pointer;
-  transition: all var(--transition);
-  margin-bottom: 14px;
-}
-
-.scanner-area:hover { border-color: var(--blue); }
-
-.scanner-icon {
-  font-size: 48px;
-  margin-bottom: 12px;
-  color: var(--blue);
-}
-
-.scanner-text {
-  font-size: 15px;
-  font-weight: 600;
-  margin-bottom: 4px;
-}
-
-.scanner-hint {
-  font-size: 12px;
-  color: var(--text-secondary);
-}
-
-.recent-receipts {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.receipt-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 14px;
-  background: var(--bg-secondary);
-  border-radius: var(--radius-sm);
-}
-
-.receipt-left {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.receipt-thumb {
-  width: 40px;
-  height: 40px;
-  border-radius: 8px;
-  background: var(--bg-card);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-}
-
-.receipt-merchant {
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.receipt-date {
-  font-size: 11px;
-  color: var(--text-secondary);
-}
-
-.receipt-amount {
-  font-size: 15px;
-  font-weight: 700;
-}
-
-/* ─── Emergency ─── */
-.emergency-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
-
-.emergency-btn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  padding: 20px;
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
-  background: var(--bg-card);
-  cursor: pointer;
-  transition: all var(--transition);
-  text-align: center;
-}
-
-.emergency-btn:hover { border-color: var(--red); background: var(--red-dim); }
-
-.emergency-icon {
-  font-size: 28px;
-}
-
-.emergency-label {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-/* ─── Badges ─── */
-.badge-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 10px;
-}
-
-.badge-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  padding: 16px 8px;
-  background: var(--bg-secondary);
-  border-radius: var(--radius-sm);
-  text-align: center;
-}
-
-.badge-item.earned { border: 1px solid rgba(0,212,255,0.3); }
-.badge-item.locked { opacity: 0.5; }
-
-.badge-emoji {
-  font-size: 32px;
-}
-
-.badge-name {
-  font-size: 11px;
-  font-weight: 600;
-  line-height: 1.2;
-}
-
-.badge-progress {
-  font-size: 10px;
-  color: var(--text-secondary);
-}
-
-/* ─── Profile ─── */
-.profile-header {
+/* ════════════════════════════════════════════════
+   PROFILE TAB
+   ════════════════════════════════════════════════ */
+.prof-hd {
   display: flex;
   align-items: center;
   gap: 16px;
   margin-bottom: 20px;
 }
 
-.profile-avatar {
+.prof-avatar {
   width: 64px;
   height: 64px;
   border-radius: 50%;
@@ -916,470 +1225,232 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 26px;
-  font-weight: 700;
-  color: var(--bg-primary);
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--bg-1);
   flex-shrink: 0;
+  box-shadow: 0 4px 16px var(--blue-glow);
 }
 
-.profile-name {
-  font-size: 20px;
-  font-weight: 700;
-}
+.prof-name { font-size: 20px; font-weight: 800; }
+.prof-sub { font-size: 13px; color: var(--text-2); margin-top: 2px; }
 
-.profile-since {
-  font-size: 13px;
-  color: var(--text-secondary);
-}
-
-.profile-stats {
+.prof-stats {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  gap: 10px;
+  gap: 8px;
   margin-bottom: 20px;
 }
 
-.profile-stat {
+.prof-stat {
   text-align: center;
-  padding: 14px;
-  background: var(--bg-secondary);
-  border-radius: var(--radius-sm);
+  padding: 14px 8px;
+  background: var(--bg-2);
+  border-radius: var(--r-md);
 }
 
-.profile-stat-value {
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--blue);
+.prof-stat-val { font-size: 18px; font-weight: 800; color: var(--blue); }
+.prof-stat-lbl { font-size: 10px; color: var(--text-2); margin-top: 2px; font-weight: 600; text-transform: uppercase; }
+
+/* Badges */
+.badge-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
 }
 
-.profile-stat-label {
-  font-size: 11px;
-  color: var(--text-secondary);
-  margin-top: 2px;
-}
-
-.settings-list {
+.badge {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  align-items: center;
+  gap: 5px;
+  padding: 14px 6px;
+  background: var(--bg-2);
+  border-radius: var(--r-md);
+  text-align: center;
+  border: 1px solid transparent;
+  transition: all var(--dur) var(--ease);
 }
 
-.settings-item {
+.badge.earned { border-color: rgba(0,212,255,0.2); }
+.badge.locked { opacity: 0.45; }
+
+.badge-emoji { font-size: 30px; }
+.badge-name { font-size: 10px; font-weight: 700; line-height: 1.2; }
+.badge-prog { font-size: 9px; color: var(--text-2); font-weight: 600; }
+
+/* Settings Row */
+.set-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 14px 16px;
-  background: var(--bg-card);
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  transition: background var(--transition);
-}
-
-.settings-item:hover { background: var(--bg-card-hover); }
-
-.settings-left {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.settings-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 15px;
-  background: var(--bg-secondary);
-}
-
-.settings-label {
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.settings-chevron {
-  color: var(--text-dim);
-  font-size: 16px;
-}
-
-/* ─── Toggle ─── */
-.toggle {
-  width: 44px;
-  height: 24px;
-  border-radius: 12px;
-  background: var(--text-dim);
-  position: relative;
-  cursor: pointer;
-  transition: background var(--transition);
-}
-
-.toggle.active { background: var(--blue); }
-
-.toggle::after {
-  content: '';
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: white;
-  transition: transform var(--transition);
-}
-
-.toggle.active::after { transform: translateX(20px); }
-
-/* ─── Shift Button ─── */
-.shift-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  width: 100%;
-  padding: 16px;
-  border-radius: var(--radius);
-  border: none;
-  font-size: 16px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all var(--transition);
-  margin-bottom: 14px;
-}
-
-.shift-btn.start {
-  background: linear-gradient(135deg, var(--green), #00cc6a);
-  color: var(--bg-primary);
-}
-
-.shift-btn.stop {
-  background: linear-gradient(135deg, var(--red), #cc3355);
-  color: white;
-}
-
-.shift-btn:active { transform: scale(0.98); }
-
-/* ─── Voice ─── */
-.voice-btn {
-  position: fixed;
-  bottom: 80px;
-  right: max(16px, calc((100vw - 480px) / 2 + 16px));
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--blue), #0099cc);
-  border: none;
-  color: white;
-  font-size: 22px;
-  cursor: pointer;
-  box-shadow: 0 4px 20px rgba(0,212,255,0.4);
-  z-index: 15;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all var(--transition);
-}
-
-.voice-btn:hover { transform: scale(1.08); }
-.voice-btn:active { transform: scale(0.95); }
-.voice-btn.listening {
-  animation: voice-pulse 1s infinite;
-  background: linear-gradient(135deg, var(--green), #00cc6a);
-}
-
-@keyframes voice-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(0,255,136,0.4); }
-  50% { box-shadow: 0 0 0 16px rgba(0,255,136,0); }
-}
-
-/* ─── Misc ─── */
-.divider {
-  height: 1px;
-  background: var(--border);
-  margin: 16px 0;
-}
-
-.earnings-total-card {
-  text-align: center;
-  padding: 28px 20px;
-}
-
-.earnings-big {
-  font-size: 44px;
-  font-weight: 700;
-  color: var(--green);
-  line-height: 1;
-  margin-bottom: 6px;
-}
-
-.earnings-subtitle {
-  font-size: 14px;
-  color: var(--text-secondary);
-}
-
-/* ─── Quarterly Timeline ─── */
-.quarterly-timeline {
-  display: flex;
-  gap: 8px;
-}
-
-.q-item {
-  flex: 1;
-  text-align: center;
-  padding: 12px 6px;
-  background: var(--bg-secondary);
-  border-radius: var(--radius-sm);
-  position: relative;
-}
-
-.q-item.active { border: 1px solid var(--blue); }
-.q-item.paid { border: 1px solid var(--green); }
-
-.q-label {
-  font-size: 12px;
-  font-weight: 700;
+  background: var(--bg-3);
+  border-radius: var(--r-md);
   margin-bottom: 4px;
+  transition: background var(--dur) var(--ease);
 }
 
-.q-amount {
-  font-size: 14px;
-  font-weight: 700;
+.set-row:active { background: var(--bg-4); }
+
+.set-left { display: flex; align-items: center; gap: 12px; }
+
+.set-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: var(--bg-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
 }
 
-.q-status {
-  font-size: 10px;
-  margin-top: 4px;
-  font-weight: 600;
+.set-label { font-size: 14px; font-weight: 600; }
+.set-chevron { color: var(--text-3); font-size: 18px; }
+
+/* Emergency */
+.emer-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
 }
 
-.q-item.paid .q-status { color: var(--green); }
-.q-item.active .q-status { color: var(--yellow); }
-
-/* ─── Notification toast ─── */
-.toast {
-  position: fixed;
-  top: -60px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--bg-card);
+.emer-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 22px 12px;
+  border-radius: var(--r-lg);
   border: 1px solid var(--border);
-  padding: 12px 24px;
-  border-radius: var(--radius);
-  font-size: 14px;
-  font-weight: 600;
-  z-index: 100;
-  transition: top 0.4s ease;
-  box-shadow: var(--shadow);
-  white-space: nowrap;
+  background: var(--bg-3);
+  transition: all var(--dur) var(--ease);
+  text-align: center;
 }
 
-.toast.show { top: 20px; }
+.emer-btn:active { border-color: var(--red); background: var(--red-dim); transform: scale(0.97); }
 
-/* ─── Scrollbar ─── */
-.content::-webkit-scrollbar { width: 4px; }
-.content::-webkit-scrollbar-track { background: transparent; }
-.content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-
-/* ─── Responsive tweaks ─── */
-@media (min-width: 1024px) {
-  body {
-    background: #060a10;
-  }
-  .app {
-    box-shadow: 0 0 60px rgba(0,212,255,0.08);
-  }
-}
+.emer-icon { font-size: 30px; }
+.emer-label { font-size: 13px; font-weight: 700; }
 </style>
 </head>
 <body>
 
 <div class="app">
-  <!-- Header -->
+  <!-- ═══ HEADER ═══ -->
   <div class="header">
-    <div class="header-logo">
-      <svg viewBox="0 0 28 28" fill="none">
-        <path d="M14 2L4 8v12l10 6 10-6V8L14 2z" stroke="var(--blue)" stroke-width="2" fill="none"/>
-        <path d="M8 12l4 4 8-8" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-      <span><span class="ride">Ride</span><span class="forge">Forge</span></span>
+    <div class="h-logo">
+      <div class="h-logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#0a0e17" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2L4 7v10l8 5 8-5V7l-8-5z"/>
+          <path d="M8 12l3 3 5-6"/>
+        </svg>
+      </div>
+      <span><span class="t1">Ride</span><span class="t2">Forge</span></span>
     </div>
-    <div class="header-right">
-      <div class="status-dot"></div>
-      <button class="header-btn" onclick="showToast('No new notifications')">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
+    <div class="h-right">
+      <div class="h-online" id="onlineDot"></div>
+      <button class="h-btn" onclick="toast('🔔','3 new notifications')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+        <span class="notif-dot"></span>
       </button>
-      <button class="header-btn" onclick="showToast('Settings coming soon')">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      <button class="h-btn" onclick="openModal('settingsModal')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
       </button>
     </div>
   </div>
 
-  <!-- Content -->
-  <div class="content">
+  <!-- ═══ SCROLLABLE CONTENT ═══ -->
+  <div class="content" id="content">
 
-    <!-- ════════ HOME TAB ════════ -->
-    <div class="tab-content active" id="tab-home">
-      <!-- Shift Button -->
+    <!-- ▓▓▓▓▓▓▓▓ HOME ▓▓▓▓▓▓▓▓ -->
+    <div class="panel active" id="p-home">
+
+      <!-- Shift Control -->
       <button class="shift-btn start" id="shiftBtn" onclick="toggleShift()">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
-        START SHIFT
+        <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
+        <span id="shiftLabel">START SHIFT</span>
       </button>
 
-      <!-- Status Bar -->
-      <div class="status-bar excellent" id="statusBar">
-        <div class="status-indicator"></div>
-        <div class="status-text">Excellent Day — Earning above average</div>
+      <div class="shift-timer" id="shiftTimer">
+        <div class="timer" id="timerDisplay">00:00:00</div>
+        <div class="timer-label">Shift Duration</div>
+      </div>
+
+      <!-- Status -->
+      <div class="status-bar sb-excellent" id="statusBar">
+        <div class="dot"></div>
+        <div class="text">Excellent Day — Earning above average</div>
       </div>
 
       <!-- Today's Snapshot -->
-      <div class="section-header">
-        <div class="section-title">Today's Snapshot</div>
-        <span class="card-badge badge-green">Live</span>
-      </div>
+      <div class="sh"><div class="sh-title">Today's Snapshot</div><span class="pill pill-green">Live</span></div>
 
-      <div class="metrics-grid">
-        <div class="metric-card">
-          <div class="metric-value" style="color:var(--green)" id="grossEarnings">$187.42</div>
-          <div class="metric-label">Gross Earnings</div>
-          <div class="metric-change change-up">+12% vs avg</div>
+      <div class="met-grid" id="metricsGrid">
+        <div class="met">
+          <div class="met-val" style="color:var(--green)" id="mGross">$0.00</div>
+          <div class="met-lbl">Gross Earnings</div>
+          <div class="met-chg up">▲ 12% vs avg</div>
+          <canvas class="met-spark" id="sparkGross"></canvas>
         </div>
-        <div class="metric-card">
-          <div class="metric-value" style="color:var(--blue)" id="netEarnings">$141.38</div>
-          <div class="metric-label">Est. Net</div>
-          <div class="metric-change change-up">+8% vs avg</div>
+        <div class="met">
+          <div class="met-val" style="color:var(--blue)" id="mNet">$0.00</div>
+          <div class="met-lbl">Est. Net</div>
+          <div class="met-chg up">▲ 8% vs avg</div>
+          <canvas class="met-spark" id="sparkNet"></canvas>
         </div>
-        <div class="metric-card">
-          <div class="metric-value" id="bizMiles">92.7</div>
-          <div class="metric-label">Business Miles</div>
-          <div class="metric-change change-up">+5.2 mi</div>
+        <div class="met">
+          <div class="met-val" id="mMiles">0.0</div>
+          <div class="met-lbl">Business Miles</div>
+          <div class="met-chg up">▲ 5.2 mi</div>
         </div>
-        <div class="metric-card">
-          <div class="metric-value" id="activeHours">6.3</div>
-          <div class="metric-label">Active Hours</div>
-          <div class="metric-change change-down">-0.4 hr</div>
+        <div class="met">
+          <div class="met-val" id="mHours">0.0</div>
+          <div class="met-lbl">Active Hours</div>
+          <div class="met-chg down">▼ 0.4 hr</div>
         </div>
-        <div class="metric-card">
-          <div class="metric-value" style="color:var(--yellow)" id="taxAside">$42</div>
-          <div class="metric-label">Taxes Set Aside</div>
+        <div class="met">
+          <div class="met-val" style="color:var(--yellow)" id="mTax">$0</div>
+          <div class="met-lbl">Taxes Set Aside</div>
         </div>
-        <div class="metric-card">
-          <div class="metric-value" style="color:var(--blue)" id="hourlyRate">$29.74</div>
-          <div class="metric-label">$/Hour</div>
-          <div class="metric-change change-up">Top 15%</div>
-        </div>
-      </div>
-
-      <div class="divider"></div>
-
-      <!-- Smart Dispatch Preview -->
-      <div class="section-header">
-        <div class="section-title">Smart Dispatch AI</div>
-        <button class="section-link" onclick="switchTab('earnings')">View All</button>
-      </div>
-
-      <div class="dispatch-card accept">
-        <div class="dispatch-verdict">Accept</div>
-        <div class="dispatch-details">
-          <div class="dispatch-platform">Uber Ride</div>
-          <div class="dispatch-payout">$17.25</div>
-        </div>
-        <div class="dispatch-meta">
-          <span>7.3 mi</span>
-          <span>18 min</span>
-          <span>$2.36/mi</span>
-        </div>
-        <div class="profit-score-bar"><div class="profit-score-fill" style="width:95%"></div></div>
-        <div class="profit-score-label">
-          <span>Profit Score</span>
-          <span>95/100</span>
-        </div>
-      </div>
-
-      <div class="dispatch-card decline">
-        <div class="dispatch-verdict">Decline</div>
-        <div class="dispatch-details">
-          <div class="dispatch-platform">DoorDash</div>
-          <div class="dispatch-payout">$4.25</div>
-        </div>
-        <div class="dispatch-meta">
-          <span>9.8 mi</span>
-          <span>32 min</span>
-          <span>$0.43/mi</span>
-        </div>
-        <div class="profit-score-bar"><div class="profit-score-fill" style="width:12%"></div></div>
-        <div class="profit-score-label">
-          <span>Profit Score</span>
-          <span>12/100</span>
+        <div class="met">
+          <div class="met-val" style="color:var(--blue)" id="mRate">$0.00</div>
+          <div class="met-lbl">$/Hour</div>
+          <div class="met-chg up">Top 15%</div>
         </div>
       </div>
 
       <div class="divider"></div>
 
-      <!-- Connected Platforms -->
-      <div class="section-header">
-        <div class="section-title">Platform Earnings</div>
+      <!-- Dispatch AI -->
+      <div class="sh">
+        <div class="sh-title">Smart Dispatch AI</div>
+        <button class="sh-link" onclick="go('earnings')">View All</button>
       </div>
 
-      <div class="platform-grid">
-        <div class="platform-item">
-          <div class="platform-icon" style="background:#000;color:#fff">U</div>
-          <div class="platform-info">
-            <div class="platform-name">Uber</div>
-            <div class="platform-earnings">$72.50</div>
-          </div>
-        </div>
-        <div class="platform-item">
-          <div class="platform-icon" style="background:#ea0b8c;color:#fff">L</div>
-          <div class="platform-info">
-            <div class="platform-name">Lyft</div>
-            <div class="platform-earnings">$38.20</div>
-          </div>
-        </div>
-        <div class="platform-item">
-          <div class="platform-icon" style="background:#06c167;color:#fff">UE</div>
-          <div class="platform-info">
-            <div class="platform-name">Uber Eats</div>
-            <div class="platform-earnings">$31.47</div>
-          </div>
-        </div>
-        <div class="platform-item">
-          <div class="platform-icon" style="background:#ff3008;color:#fff">DD</div>
-          <div class="platform-info">
-            <div class="platform-name">DoorDash</div>
-            <div class="platform-earnings">$22.15</div>
-          </div>
-        </div>
-        <div class="platform-item">
-          <div class="platform-icon" style="background:#0aad0a;color:#fff">IC</div>
-          <div class="platform-info">
-            <div class="platform-name">Instacart</div>
-            <div class="platform-earnings">$15.60</div>
-          </div>
-        </div>
-        <div class="platform-item">
-          <div class="platform-icon" style="background:#0071dc;color:#fff">SP</div>
-          <div class="platform-info">
-            <div class="platform-name">Spark</div>
-            <div class="platform-earnings">$7.50</div>
-          </div>
-        </div>
-      </div>
+      <div id="dispatchContainer"></div>
 
       <div class="divider"></div>
 
-      <!-- Driver Score Preview -->
-      <div class="section-header">
-        <div class="section-title">Driver Score</div>
-        <button class="section-link" onclick="switchTab('profile')">Details</button>
+      <!-- Platforms -->
+      <div class="sh"><div class="sh-title">Platform Earnings</div></div>
+      <div class="plat-grid" id="platGrid"></div>
+
+      <div class="divider"></div>
+
+      <!-- Driver Score -->
+      <div class="sh">
+        <div class="sh-title">Driver Score</div>
+        <button class="sh-link" onclick="go('profile')">Details</button>
       </div>
 
-      <div class="card">
-        <div class="score-ring-container">
-          <canvas id="scoreCanvas" width="200" height="200"></canvas>
+      <div class="card card-glow-blue">
+        <div class="score-ring-wrap">
+          <canvas id="scoreRing" width="360" height="360"></canvas>
           <div class="score-center">
-            <div class="score-value">847</div>
-            <div class="score-max">/ 1000</div>
+            <div class="score-num" id="scoreVal">0</div>
+            <div class="score-of">/ 1000</div>
           </div>
         </div>
       </div>
@@ -1387,1263 +1458,1145 @@ html, body {
       <div class="divider"></div>
 
       <!-- Emergency -->
-      <div class="section-header">
-        <div class="section-title">Emergency</div>
-      </div>
-
-      <div class="emergency-grid">
-        <button class="emergency-btn" onclick="showToast('Location shared with emergency contact')">
-          <div class="emergency-icon">📍</div>
-          <div class="emergency-label">Share Location</div>
-        </button>
-        <button class="emergency-btn" onclick="showToast('Calling 911...')">
-          <div class="emergency-icon">🚨</div>
-          <div class="emergency-label">Call 911</div>
-        </button>
-        <button class="emergency-btn" onclick="showToast('Recording started')">
-          <div class="emergency-icon">🎥</div>
-          <div class="emergency-label">Record</div>
-        </button>
-        <button class="emergency-btn" onclick="showToast('Incident note saved')">
-          <div class="emergency-icon">📝</div>
-          <div class="emergency-label">Incident Note</div>
-        </button>
+      <div class="sh"><div class="sh-title">Emergency</div></div>
+      <div class="emer-grid">
+        <button class="emer-btn" onclick="toast('📍','Location shared with emergency contact')"><div class="emer-icon">📍</div><div class="emer-label">Share Location</div></button>
+        <button class="emer-btn" onclick="toast('🚨','Calling 911...')"><div class="emer-icon">🚨</div><div class="emer-label">Call 911</div></button>
+        <button class="emer-btn" onclick="toast('🎥','Recording started')"><div class="emer-icon">🎥</div><div class="emer-label">Record</div></button>
+        <button class="emer-btn" onclick="toast('📝','Incident note saved')"><div class="emer-icon">📝</div><div class="emer-label">Incident Note</div></button>
       </div>
     </div>
 
-    <!-- ════════ MAP TAB ════════ -->
-    <div class="tab-content" id="tab-map">
-      <div class="section-header">
-        <div class="section-title">Live Profit Map</div>
-        <span class="card-badge badge-green">Live</span>
-      </div>
+    <!-- ▓▓▓▓▓▓▓▓ MAP ▓▓▓▓▓▓▓▓ -->
+    <div class="panel" id="p-map">
+      <div class="sh" style="margin-top:0"><div class="sh-title">Live Profit Map</div><span class="pill pill-green">Live</span></div>
 
-      <div class="map-container">
-        <canvas class="map-canvas" id="mapCanvas"></canvas>
+      <div class="map-wrap">
+        <canvas id="mapCanvas"></canvas>
         <div class="map-legend">
-          <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div>Surge</div>
-          <div class="legend-item"><div class="legend-dot" style="background:var(--yellow)"></div>Hotspot</div>
-          <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div>High Demand</div>
-          <div class="legend-item"><div class="legend-dot" style="background:var(--purple)"></div>Events</div>
+          <div class="leg"><div class="leg-dot" style="background:var(--red)"></div>Surge</div>
+          <div class="leg"><div class="leg-dot" style="background:var(--yellow)"></div>Hotspot</div>
+          <div class="leg"><div class="leg-dot" style="background:var(--green)"></div>Demand</div>
+          <div class="leg"><div class="leg-dot" style="background:var(--purple)"></div>Events</div>
         </div>
-        <div class="map-action-btns">
-          <button class="map-btn" onclick="showToast('Centering on your location')">⊕</button>
-          <button class="map-btn" onclick="showToast('Refreshing map data')">↻</button>
+        <div class="map-btns">
+          <button class="map-btn-circ" onclick="toast('📍','Centering on location')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></svg>
+          </button>
+          <button class="map-btn-circ" onclick="drawMap();toast('🔄','Map refreshed')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 4v6h6"/><path d="M23 20v-6h-6"/><path d="M20.49 9A9 9 0 005.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 013.51 15"/></svg>
+          </button>
         </div>
       </div>
 
-      <div class="card">
-        <div class="card-header">
+      <!-- AI Rec -->
+      <div class="card card-glow-blue">
+        <div class="card-hd">
           <div class="card-title">AI Recommendation</div>
-          <span class="card-badge badge-blue">Smart</span>
+          <span class="pill pill-blue">Smart</span>
         </div>
-        <div style="font-size:14px;line-height:1.5">
-          Head to <strong style="color:var(--blue)">Downtown & 5th Ave</strong> area. Surge pricing active with 2.1x multiplier.
-          Estimated wait: <strong>3 min</strong> for next ride request.
+        <div style="font-size:14px;line-height:1.6">
+          Head to <strong style="color:var(--blue)">Downtown &amp; 5th Ave</strong>. Surge pricing active with <strong style="color:var(--green)">2.1x</strong> multiplier. Estimated wait: <strong>3 min</strong> for next request.
         </div>
       </div>
 
-      <div class="section-header">
-        <div class="section-title">Nearby Hotspots</div>
+      <!-- Hotspots -->
+      <div class="card">
+        <div class="card-hd"><div class="card-title">Nearby Hotspots</div></div>
+        <div class="hotspot-item">
+          <div><div class="hs-name">Airport Terminal B</div><div class="hs-dist">3.2 mi away</div></div>
+          <span class="pill pill-green">High</span>
+        </div>
+        <div class="hotspot-item">
+          <div><div class="hs-name">Convention Center</div><div class="hs-dist">1.8 mi away</div></div>
+          <span class="pill pill-yellow">Moderate</span>
+        </div>
+        <div class="hotspot-item">
+          <div><div class="hs-name">Stadium District</div><div class="hs-dist">4.5 mi — Concert 8PM</div></div>
+          <span class="pill pill-purple">Event</span>
+        </div>
+      </div>
+
+      <!-- Conditions -->
+      <div class="card">
+        <div class="card-hd"><div class="card-title">Conditions</div></div>
+        <div style="display:flex;gap:8px">
+          <div style="flex:1;padding:14px;background:var(--bg-2);border-radius:var(--r-sm);text-align:center">
+            <div style="font-size:24px;margin-bottom:4px">🚗</div>
+            <div style="font-size:12px;font-weight:700;color:var(--yellow)">Moderate</div>
+            <div style="font-size:10px;color:var(--text-2)">I-95 delays</div>
+          </div>
+          <div style="flex:1;padding:14px;background:var(--bg-2);border-radius:var(--r-sm);text-align:center">
+            <div style="font-size:24px;margin-bottom:4px">☀️</div>
+            <div style="font-size:12px;font-weight:700;color:var(--green)">Clear</div>
+            <div style="font-size:10px;color:var(--text-2)">78°F</div>
+          </div>
+          <div style="flex:1;padding:14px;background:var(--bg-2);border-radius:var(--r-sm);text-align:center">
+            <div style="font-size:24px;margin-bottom:4px">🔧</div>
+            <div style="font-size:12px;font-weight:700;color:var(--red)">1 Zone</div>
+            <div style="font-size:10px;color:var(--text-2)">Construction</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ▓▓▓▓▓▓▓▓ EARNINGS ▓▓▓▓▓▓▓▓ -->
+    <div class="panel" id="p-earnings">
+      <div class="earn-hero">
+        <div class="earn-big" id="weekTotal">$0.00</div>
+        <div class="earn-sub">This Week's Gross Earnings</div>
+      </div>
+
+      <div class="ctabs" id="earTabs">
+        <button class="ctab active" data-p="daily">Daily</button>
+        <button class="ctab" data-p="weekly">Weekly</button>
+        <button class="ctab" data-p="monthly">Monthly</button>
       </div>
 
       <div class="card">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-          <div>
-            <div style="font-weight:700;font-size:15px">Airport Terminal B</div>
-            <div style="font-size:12px;color:var(--text-secondary)">3.2 mi away</div>
-          </div>
-          <span class="card-badge badge-green">High Demand</span>
+        <div class="card-hd"><div class="card-title">Earnings Trend</div></div>
+        <div class="chart-wrap"><canvas id="earnChart"></canvas></div>
+      </div>
+
+      <div class="card">
+        <div class="card-hd"><div class="card-title">Hourly Breakdown</div></div>
+        <div class="chart-wrap"><canvas id="hourChart"></canvas></div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Scanner -->
+      <div class="sh"><div class="sh-title">Expense Scanner</div></div>
+
+      <button class="scanner" onclick="openModal('addExpenseModal')">
+        <div class="scanner-icon">📷</div>
+        <div class="scanner-txt">Scan a Receipt</div>
+        <div class="scanner-hint">Tap to photograph and auto-extract</div>
+      </button>
+
+      <div class="sh"><div class="sh-title">Recent Expenses</div><button class="sh-link" onclick="openModal('addExpenseModal')">+ Add</button></div>
+      <div id="expenseList"></div>
+
+      <div class="divider"></div>
+
+      <!-- Quick Stats -->
+      <div class="sh"><div class="sh-title">Quick Stats</div></div>
+      <div class="met-grid">
+        <div class="met"><div class="met-val" style="color:var(--green)">Fri</div><div class="met-lbl">Best Day</div></div>
+        <div class="met"><div class="met-val" style="color:var(--blue);font-size:20px">Downtown</div><div class="met-lbl">Best Area</div></div>
+        <div class="met"><div class="met-val" style="color:var(--green);font-size:20px">Uber</div><div class="met-lbl">Top Platform</div></div>
+        <div class="met"><div class="met-val" style="color:var(--blue)">5-7PM</div><div class="met-lbl">Peak Hours</div></div>
+      </div>
+
+      <div class="card" style="margin-top:14px">
+        <div class="card-hd"><div class="card-title">Cost Per Mile</div><span class="pill pill-green">$0.49</span></div>
+        <div class="chart-wrap" style="height:160px"><canvas id="cpmChart"></canvas></div>
+      </div>
+
+      <div class="card">
+        <div class="card-hd"><div class="card-title">Best Days</div></div>
+        <div class="chart-wrap" style="height:160px"><canvas id="bestDaysChart"></canvas></div>
+      </div>
+    </div>
+
+    <!-- ▓▓▓▓▓▓▓▓ TAXES ▓▓▓▓▓▓▓▓ -->
+    <div class="panel" id="p-taxes">
+      <div class="sh" style="margin-top:0"><div class="sh-title">Tax Center</div><span class="pill pill-yellow">Q3 2026</span></div>
+
+      <div class="tax-grid">
+        <div class="tax-cell"><div class="tax-lbl">YTD Gross</div><div class="tax-val" style="color:var(--green)">$38,420</div></div>
+        <div class="tax-cell"><div class="tax-lbl">Deductions</div><div class="tax-val" style="color:var(--blue)">$12,847</div></div>
+        <div class="tax-cell"><div class="tax-lbl">Taxable Income</div><div class="tax-val" style="color:var(--yellow)">$25,573</div></div>
+        <div class="tax-cell"><div class="tax-lbl">Est. Tax Owed</div><div class="tax-val" style="color:var(--red)">$6,393</div></div>
+      </div>
+
+      <div class="sh"><div class="sh-title">Quarterly Payments</div></div>
+
+      <div class="q-row">
+        <div class="q-cell paid">
+          <div class="q-lbl">Q1</div>
+          <div class="q-amt" style="color:var(--green)">$1,480</div>
+          <div class="q-status" style="color:var(--green)">Paid ✓</div>
         </div>
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-          <div>
-            <div style="font-weight:700;font-size:15px">Convention Center</div>
-            <div style="font-size:12px;color:var(--text-secondary)">1.8 mi away</div>
-          </div>
-          <span class="card-badge badge-yellow">Moderate</span>
+        <div class="q-cell paid">
+          <div class="q-lbl">Q2</div>
+          <div class="q-amt" style="color:var(--green)">$1,598</div>
+          <div class="q-status" style="color:var(--green)">Paid ✓</div>
         </div>
+        <div class="q-cell due">
+          <div class="q-lbl">Q3</div>
+          <div class="q-amt" style="color:var(--yellow)">$1,650</div>
+          <div class="q-status" style="color:var(--yellow)">Due Sep 15</div>
+        </div>
+        <div class="q-cell">
+          <div class="q-lbl">Q4</div>
+          <div class="q-amt" style="color:var(--text-3)">$1,665</div>
+          <div class="q-status" style="color:var(--text-3)">Jan 15</div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="sh"><div class="sh-title">Deductions</div></div>
+
+      <div class="card">
+        <div class="chart-wrap" style="height:180px"><canvas id="dedChart"></canvas></div>
+      </div>
+
+      <div id="deductionList"></div>
+
+      <div style="text-align:center;margin-top:20px">
+        <button class="btn btn-primary" onclick="toast('📄','Tax report exported (demo)')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export CPA Report
+        </button>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Maintenance -->
+      <div class="sh"><div class="sh-title">Maintenance Center</div></div>
+
+      <div class="card" style="margin-bottom:12px">
         <div style="display:flex;justify-content:space-between;align-items:center">
           <div>
-            <div style="font-weight:700;font-size:15px">Stadium District</div>
-            <div style="font-size:12px;color:var(--text-secondary)">4.5 mi away — Concert 8PM</div>
-          </div>
-          <span class="card-badge badge-blue">Event</span>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">Traffic & Weather</div>
-        </div>
-        <div style="display:flex;gap:12px">
-          <div style="flex:1;padding:12px;background:var(--bg-secondary);border-radius:var(--radius-sm);text-align:center">
-            <div style="font-size:24px;margin-bottom:4px">🚗</div>
-            <div style="font-size:13px;font-weight:600;color:var(--yellow)">Moderate</div>
-            <div style="font-size:11px;color:var(--text-secondary)">I-95 delays</div>
-          </div>
-          <div style="flex:1;padding:12px;background:var(--bg-secondary);border-radius:var(--radius-sm);text-align:center">
-            <div style="font-size:24px;margin-bottom:4px">☀️</div>
-            <div style="font-size:13px;font-weight:600;color:var(--green)">Clear</div>
-            <div style="font-size:11px;color:var(--text-secondary)">78°F</div>
-          </div>
-          <div style="flex:1;padding:12px;background:var(--bg-secondary);border-radius:var(--radius-sm);text-align:center">
-            <div style="font-size:24px;margin-bottom:4px">🔧</div>
-            <div style="font-size:13px;font-weight:600;color:var(--red)">1 Zone</div>
-            <div style="font-size:11px;color:var(--text-secondary)">Construction</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ════════ EARNINGS TAB ════════ -->
-    <div class="tab-content" id="tab-earnings">
-      <div class="card earnings-total-card">
-        <div class="earnings-big" id="weekEarnings">$1,247.83</div>
-        <div class="earnings-subtitle">This Week's Gross Earnings</div>
-      </div>
-
-      <div class="chart-tabs" id="earningsChartTabs">
-        <button class="chart-tab active" data-period="daily">Daily</button>
-        <button class="chart-tab" data-period="weekly">Weekly</button>
-        <button class="chart-tab" data-period="monthly">Monthly</button>
-      </div>
-
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">Earnings Trend</div>
-        </div>
-        <div class="chart-container">
-          <canvas id="earningsChart"></canvas>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">Hourly Breakdown</div>
-        </div>
-        <div class="chart-container">
-          <canvas id="hourlyChart"></canvas>
-        </div>
-      </div>
-
-      <div class="section-header">
-        <div class="section-title">All Dispatch Offers</div>
-      </div>
-
-      <div class="dispatch-card accept">
-        <div class="dispatch-verdict">Accept</div>
-        <div class="dispatch-details">
-          <div class="dispatch-platform">Lyft Ride</div>
-          <div class="dispatch-payout">$22.40</div>
-        </div>
-        <div class="dispatch-meta">
-          <span>5.1 mi</span>
-          <span>14 min</span>
-          <span>$4.39/mi</span>
-        </div>
-        <div class="profit-score-bar"><div class="profit-score-fill" style="width:98%"></div></div>
-        <div class="profit-score-label"><span>Profit Score</span><span>98/100</span></div>
-      </div>
-
-      <div class="dispatch-card accept">
-        <div class="dispatch-verdict">Accept</div>
-        <div class="dispatch-details">
-          <div class="dispatch-platform">Uber Ride</div>
-          <div class="dispatch-payout">$17.25</div>
-        </div>
-        <div class="dispatch-meta">
-          <span>7.3 mi</span>
-          <span>18 min</span>
-          <span>$2.36/mi</span>
-        </div>
-        <div class="profit-score-bar"><div class="profit-score-fill" style="width:95%"></div></div>
-        <div class="profit-score-label"><span>Profit Score</span><span>95/100</span></div>
-      </div>
-
-      <div class="dispatch-card accept">
-        <div class="dispatch-verdict">Accept</div>
-        <div class="dispatch-details">
-          <div class="dispatch-platform">Instacart Batch</div>
-          <div class="dispatch-payout">$28.75</div>
-        </div>
-        <div class="dispatch-meta">
-          <span>4.2 mi</span>
-          <span>45 min</span>
-          <span>$38.33/hr</span>
-        </div>
-        <div class="profit-score-bar"><div class="profit-score-fill" style="width:82%"></div></div>
-        <div class="profit-score-label"><span>Profit Score</span><span>82/100</span></div>
-      </div>
-
-      <div class="dispatch-card decline">
-        <div class="dispatch-verdict">Decline</div>
-        <div class="dispatch-details">
-          <div class="dispatch-platform">DoorDash</div>
-          <div class="dispatch-payout">$4.25</div>
-        </div>
-        <div class="dispatch-meta">
-          <span>9.8 mi</span>
-          <span>32 min</span>
-          <span>$0.43/mi</span>
-        </div>
-        <div class="profit-score-bar"><div class="profit-score-fill" style="width:12%"></div></div>
-        <div class="profit-score-label"><span>Profit Score</span><span>12/100</span></div>
-      </div>
-
-      <div class="dispatch-card decline">
-        <div class="dispatch-verdict">Decline</div>
-        <div class="dispatch-details">
-          <div class="dispatch-platform">Grubhub</div>
-          <div class="dispatch-payout">$5.50</div>
-        </div>
-        <div class="dispatch-meta">
-          <span>11.3 mi</span>
-          <span>38 min</span>
-          <span>$0.49/mi</span>
-        </div>
-        <div class="profit-score-bar"><div class="profit-score-fill" style="width:18%"></div></div>
-        <div class="profit-score-label"><span>Profit Score</span><span>18/100</span></div>
-      </div>
-
-      <div class="divider"></div>
-
-      <!-- Expense Scanner -->
-      <div class="section-header">
-        <div class="section-title">Expense Scanner</div>
-      </div>
-
-      <div class="scanner-area" onclick="showToast('Camera opening... (demo mode)')">
-        <div class="scanner-icon">📷</div>
-        <div class="scanner-text">Scan a Receipt</div>
-        <div class="scanner-hint">Tap to photograph and auto-extract details</div>
-      </div>
-
-      <div class="section-header">
-        <div class="section-title">Recent Receipts</div>
-      </div>
-
-      <div class="recent-receipts">
-        <div class="receipt-item">
-          <div class="receipt-left">
-            <div class="receipt-thumb">⛽</div>
-            <div>
-              <div class="receipt-merchant">Shell Gas Station</div>
-              <div class="receipt-date">Today, 2:15 PM</div>
-            </div>
-          </div>
-          <div class="receipt-amount" style="color:var(--yellow)">-$48.32</div>
-        </div>
-        <div class="receipt-item">
-          <div class="receipt-left">
-            <div class="receipt-thumb">🧽</div>
-            <div>
-              <div class="receipt-merchant">Express Car Wash</div>
-              <div class="receipt-date">Yesterday, 10:30 AM</div>
-            </div>
-          </div>
-          <div class="receipt-amount" style="color:var(--yellow)">-$12.00</div>
-        </div>
-        <div class="receipt-item">
-          <div class="receipt-left">
-            <div class="receipt-thumb">🅿️</div>
-            <div>
-              <div class="receipt-merchant">Airport Parking</div>
-              <div class="receipt-date">Jul 23, 6:00 PM</div>
-            </div>
-          </div>
-          <div class="receipt-amount" style="color:var(--yellow)">-$8.00</div>
-        </div>
-      </div>
-
-      <div class="divider"></div>
-
-      <!-- Analytics -->
-      <div class="section-header">
-        <div class="section-title">Analytics</div>
-      </div>
-
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">Cost Per Mile</div>
-          <span class="card-badge badge-green">$0.49</span>
-        </div>
-        <div class="chart-container">
-          <canvas id="costPerMileChart"></canvas>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">Best Days</div>
-        </div>
-        <div class="chart-container" style="height:160px">
-          <canvas id="bestDaysChart"></canvas>
-        </div>
-      </div>
-
-      <div class="metrics-grid">
-        <div class="metric-card">
-          <div class="metric-value" style="color:var(--green)">Fri</div>
-          <div class="metric-label">Best Day</div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-value" style="color:var(--blue)">Downtown</div>
-          <div class="metric-label" style="font-size:11px">Best Area</div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-value" style="color:var(--green)">Uber</div>
-          <div class="metric-label" style="font-size:11px">Most Profitable</div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-value" style="color:var(--blue)">5-7 PM</div>
-          <div class="metric-label" style="font-size:11px">Peak Hours</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ════════ TAXES TAB ════════ -->
-    <div class="tab-content" id="tab-taxes">
-      <div class="section-header">
-        <div class="section-title">Tax Center</div>
-        <span class="card-badge badge-yellow">Q3 2026</span>
-      </div>
-
-      <div class="tax-summary">
-        <div class="tax-item">
-          <div class="tax-item-label">YTD Gross Income</div>
-          <div class="tax-item-value" style="color:var(--green)">$38,420</div>
-        </div>
-        <div class="tax-item">
-          <div class="tax-item-label">YTD Deductions</div>
-          <div class="tax-item-value" style="color:var(--blue)">$12,847</div>
-        </div>
-        <div class="tax-item">
-          <div class="tax-item-label">Taxable Income</div>
-          <div class="tax-item-value" style="color:var(--yellow)">$25,573</div>
-        </div>
-        <div class="tax-item">
-          <div class="tax-item-label">Est. Tax Owed</div>
-          <div class="tax-item-value" style="color:var(--red)">$6,393</div>
-        </div>
-      </div>
-
-      <div class="section-header">
-        <div class="section-title">Quarterly Payments</div>
-      </div>
-
-      <div class="quarterly-timeline">
-        <div class="q-item paid">
-          <div class="q-label">Q1</div>
-          <div class="q-amount" style="color:var(--green)">$1,480</div>
-          <div class="q-status">Paid</div>
-        </div>
-        <div class="q-item paid">
-          <div class="q-label">Q2</div>
-          <div class="q-amount" style="color:var(--green)">$1,598</div>
-          <div class="q-status">Paid</div>
-        </div>
-        <div class="q-item active">
-          <div class="q-label">Q3</div>
-          <div class="q-amount" style="color:var(--yellow)">$1,650</div>
-          <div class="q-status">Due Sep 15</div>
-        </div>
-        <div class="q-item">
-          <div class="q-label">Q4</div>
-          <div class="q-amount" style="color:var(--text-dim)">$1,665</div>
-          <div class="q-status" style="color:var(--text-dim)">Jan 15</div>
-        </div>
-      </div>
-
-      <div class="divider"></div>
-
-      <div class="section-header">
-        <div class="section-title">Deductions Breakdown</div>
-      </div>
-
-      <div class="card">
-        <div class="chart-container">
-          <canvas id="deductionsChart"></canvas>
-        </div>
-      </div>
-
-      <div class="deduction-list">
-        <div class="deduction-row">
-          <div class="deduction-left">
-            <div class="deduction-icon" style="background:var(--blue-dim)">🚗</div>
-            <div class="deduction-name">Mileage (14,230 mi)</div>
-          </div>
-          <div class="deduction-amount">$9,350</div>
-        </div>
-        <div class="deduction-row">
-          <div class="deduction-left">
-            <div class="deduction-icon" style="background:var(--yellow-dim)">⛽</div>
-            <div class="deduction-name">Fuel</div>
-          </div>
-          <div class="deduction-amount">$1,847</div>
-        </div>
-        <div class="deduction-row">
-          <div class="deduction-left">
-            <div class="deduction-icon" style="background:var(--green-dim)">📱</div>
-            <div class="deduction-name">Phone & Data</div>
-          </div>
-          <div class="deduction-amount">$630</div>
-        </div>
-        <div class="deduction-row">
-          <div class="deduction-left">
-            <div class="deduction-icon" style="background:var(--red-dim)">🔧</div>
-            <div class="deduction-name">Repairs & Maintenance</div>
-          </div>
-          <div class="deduction-amount">$520</div>
-        </div>
-        <div class="deduction-row">
-          <div class="deduction-left">
-            <div class="deduction-icon" style="background:var(--blue-dim)">🛡️</div>
-            <div class="deduction-name">Insurance</div>
-          </div>
-          <div class="deduction-amount">$310</div>
-        </div>
-        <div class="deduction-row">
-          <div class="deduction-left">
-            <div class="deduction-icon" style="background:var(--yellow-dim)">🧽</div>
-            <div class="deduction-name">Car Washes</div>
-          </div>
-          <div class="deduction-amount">$96</div>
-        </div>
-        <div class="deduction-row">
-          <div class="deduction-left">
-            <div class="deduction-icon" style="background:var(--green-dim)">🅿️</div>
-            <div class="deduction-name">Parking & Tolls</div>
-          </div>
-          <div class="deduction-amount">$94</div>
-        </div>
-      </div>
-
-      <div class="divider"></div>
-
-      <div class="card" style="text-align:center;padding:24px">
-        <div style="font-size:14px;color:var(--text-secondary);margin-bottom:12px">Export your tax reports</div>
-        <button style="padding:12px 28px;border-radius:var(--radius-sm);background:var(--blue);color:var(--bg-primary);border:none;font-weight:700;font-size:14px;cursor:pointer" onclick="showToast('Tax report exported (demo)')">Export CPA Report</button>
-      </div>
-
-      <div class="divider"></div>
-
-      <!-- Maintenance Center -->
-      <div class="section-header">
-        <div class="section-title">Maintenance Center</div>
-      </div>
-
-      <div class="card">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-          <div>
-            <div style="font-size:13px;color:var(--text-secondary)">Vehicle</div>
-            <div style="font-size:16px;font-weight:700">2021 Toyota Camry</div>
+            <div style="font-size:12px;color:var(--text-2);font-weight:600">VEHICLE</div>
+            <div style="font-size:16px;font-weight:800;margin-top:2px">2021 Toyota Camry</div>
           </div>
           <div style="text-align:right">
-            <div style="font-size:13px;color:var(--text-secondary)">Odometer</div>
-            <div style="font-size:16px;font-weight:700;color:var(--blue)">47,832 mi</div>
+            <div style="font-size:12px;color:var(--text-2);font-weight:600">ODOMETER</div>
+            <div style="font-size:16px;font-weight:800;color:var(--blue);margin-top:2px">47,832 mi</div>
           </div>
         </div>
       </div>
 
-      <div class="maint-list">
-        <div class="maint-item">
-          <div class="maint-status-icon urgent">🛢️</div>
-          <div class="maint-info">
-            <div class="maint-name">Oil Change</div>
-            <div class="maint-due">Overdue by 320 miles</div>
-          </div>
-          <div class="maint-miles urgent">OVERDUE</div>
-        </div>
-        <div class="maint-item">
-          <div class="maint-status-icon warning">🔄</div>
-          <div class="maint-info">
-            <div class="maint-name">Tire Rotation</div>
-            <div class="maint-due">Due in 1,200 miles</div>
-          </div>
-          <div class="maint-miles warning">1,200 mi</div>
-        </div>
-        <div class="maint-item">
-          <div class="maint-status-icon good">🛞</div>
-          <div class="maint-info">
-            <div class="maint-name">Brake Pads</div>
-            <div class="maint-due">~8,000 miles remaining</div>
-          </div>
-          <div class="maint-miles good">8,000 mi</div>
-        </div>
-        <div class="maint-item">
-          <div class="maint-status-icon good">🔋</div>
-          <div class="maint-info">
-            <div class="maint-name">Battery</div>
-            <div class="maint-due">Replaced 6 months ago</div>
-          </div>
-          <div class="maint-miles good">Good</div>
-        </div>
-        <div class="maint-item">
-          <div class="maint-status-icon good">⚙️</div>
-          <div class="maint-info">
-            <div class="maint-name">Transmission</div>
-            <div class="maint-due">Next at 60,000 miles</div>
-          </div>
-          <div class="maint-miles good">12,168 mi</div>
-        </div>
-        <div class="maint-item">
-          <div class="maint-status-icon warning">📋</div>
-          <div class="maint-info">
-            <div class="maint-name">Registration</div>
-            <div class="maint-due">Expires Oct 2026</div>
-          </div>
-          <div class="maint-miles warning">3 mo</div>
-        </div>
-      </div>
+      <div id="maintList"></div>
     </div>
 
-    <!-- ════════ PROFILE TAB ════════ -->
-    <div class="tab-content" id="tab-profile">
-      <div class="profile-header">
-        <div class="profile-avatar">BW</div>
+    <!-- ▓▓▓▓▓▓▓▓ PROFILE ▓▓▓▓▓▓▓▓ -->
+    <div class="panel" id="p-profile">
+      <div class="prof-hd">
+        <div class="prof-avatar">BW</div>
         <div>
-          <div class="profile-name">Beau Wilson</div>
-          <div class="profile-since">Member since Jan 2025</div>
+          <div class="prof-name">Beau Wilson</div>
+          <div class="prof-sub">Member since Jan 2025</div>
         </div>
       </div>
 
-      <div class="profile-stats">
-        <div class="profile-stat">
-          <div class="profile-stat-value">$38.4K</div>
-          <div class="profile-stat-label">YTD Earned</div>
-        </div>
-        <div class="profile-stat">
-          <div class="profile-stat-value">14,230</div>
-          <div class="profile-stat-label">Total Miles</div>
-        </div>
-        <div class="profile-stat">
-          <div class="profile-stat-value">847</div>
-          <div class="profile-stat-label">Driver Score</div>
-        </div>
+      <div class="prof-stats">
+        <div class="prof-stat"><div class="prof-stat-val">$38.4K</div><div class="prof-stat-lbl">YTD Earned</div></div>
+        <div class="prof-stat"><div class="prof-stat-val">14,230</div><div class="prof-stat-lbl">Total Miles</div></div>
+        <div class="prof-stat"><div class="prof-stat-val" id="profScore">0</div><div class="prof-stat-lbl">Driver Score</div></div>
       </div>
 
-      <!-- Driver Score Detail -->
       <div class="card">
-        <div class="card-header">
-          <div class="card-title">Driver Score Breakdown</div>
-          <span class="card-badge badge-green">847 / 1000</span>
-        </div>
-        <div class="score-breakdown">
-          <div class="score-row">
-            <div class="score-row-label">Profitability</div>
-            <div class="score-row-bar"><div class="score-row-fill" style="width:92%;background:var(--green)"></div></div>
-            <div class="score-row-value" style="color:var(--green)">92</div>
-          </div>
-          <div class="score-row">
-            <div class="score-row-label">Strategy</div>
-            <div class="score-row-bar"><div class="score-row-fill" style="width:88%;background:var(--blue)"></div></div>
-            <div class="score-row-value" style="color:var(--blue)">88</div>
-          </div>
-          <div class="score-row">
-            <div class="score-row-label">Fuel Efficiency</div>
-            <div class="score-row-bar"><div class="score-row-fill" style="width:79%;background:var(--yellow)"></div></div>
-            <div class="score-row-value" style="color:var(--yellow)">79</div>
-          </div>
-          <div class="score-row">
-            <div class="score-row-label">Ratings</div>
-            <div class="score-row-bar"><div class="score-row-fill" style="width:95%;background:var(--green)"></div></div>
-            <div class="score-row-value" style="color:var(--green)">95</div>
-          </div>
-          <div class="score-row">
-            <div class="score-row-label">Maintenance</div>
-            <div class="score-row-bar"><div class="score-row-fill" style="width:72%;background:var(--orange)"></div></div>
-            <div class="score-row-value" style="color:var(--orange)">72</div>
-          </div>
-          <div class="score-row">
-            <div class="score-row-label">Safety</div>
-            <div class="score-row-bar"><div class="score-row-fill" style="width:91%;background:var(--green)"></div></div>
-            <div class="score-row-value" style="color:var(--green)">91</div>
-          </div>
-          <div class="score-row">
-            <div class="score-row-label">Driving</div>
-            <div class="score-row-bar"><div class="score-row-fill" style="width:85%;background:var(--blue)"></div></div>
-            <div class="score-row-value" style="color:var(--blue)">85</div>
-          </div>
-        </div>
+        <div class="card-hd"><div class="card-title">Score Breakdown</div><span class="pill pill-green" id="profScorePill">0 / 1000</span></div>
+        <div id="scoreBreakdown"></div>
       </div>
 
       <div class="divider"></div>
 
-      <!-- Badges -->
-      <div class="section-header">
-        <div class="section-title">Achievements</div>
-        <span class="card-badge badge-blue">7 / 12</span>
-      </div>
-
-      <div class="badge-grid">
-        <div class="badge-item earned">
-          <div class="badge-emoji">🛣️</div>
-          <div class="badge-name">Road Warrior</div>
-          <div class="badge-progress" style="color:var(--green)">1,000 mi</div>
-        </div>
-        <div class="badge-item earned">
-          <div class="badge-emoji">💰</div>
-          <div class="badge-name">$10K Club</div>
-          <div class="badge-progress" style="color:var(--green)">Earned</div>
-        </div>
-        <div class="badge-item earned">
-          <div class="badge-emoji">⭐</div>
-          <div class="badge-name">Five Star Month</div>
-          <div class="badge-progress" style="color:var(--green)">Mar 2026</div>
-        </div>
-        <div class="badge-item earned">
-          <div class="badge-emoji">🔧</div>
-          <div class="badge-name">Well Oiled</div>
-          <div class="badge-progress" style="color:var(--green)">100%</div>
-        </div>
-        <div class="badge-item earned">
-          <div class="badge-emoji">📈</div>
-          <div class="badge-name">Top 10%</div>
-          <div class="badge-progress" style="color:var(--green)">Profitability</div>
-        </div>
-        <div class="badge-item earned">
-          <div class="badge-emoji">🌅</div>
-          <div class="badge-name">Early Bird</div>
-          <div class="badge-progress" style="color:var(--green)">50 AM shifts</div>
-        </div>
-        <div class="badge-item earned">
-          <div class="badge-emoji">🎯</div>
-          <div class="badge-name">Smart Picker</div>
-          <div class="badge-progress" style="color:var(--green)">90% accept rate</div>
-        </div>
-        <div class="badge-item locked">
-          <div class="badge-emoji">🏆</div>
-          <div class="badge-name">$50K Club</div>
-          <div class="badge-progress">$38.4K / $50K</div>
-        </div>
-        <div class="badge-item locked">
-          <div class="badge-emoji">🚀</div>
-          <div class="badge-name">Speed Demon</div>
-          <div class="badge-progress">20K mi needed</div>
-        </div>
-        <div class="badge-item locked">
-          <div class="badge-emoji">🌙</div>
-          <div class="badge-name">Night Owl</div>
-          <div class="badge-progress">18 / 30 shifts</div>
-        </div>
-        <div class="badge-item locked">
-          <div class="badge-emoji">💎</div>
-          <div class="badge-name">Diamond Driver</div>
-          <div class="badge-progress">Score 950+</div>
-        </div>
-        <div class="badge-item locked">
-          <div class="badge-emoji">🤝</div>
-          <div class="badge-name">Multi-Apper</div>
-          <div class="badge-progress">4 / 5 apps</div>
-        </div>
-      </div>
+      <div class="sh"><div class="sh-title">Achievements</div><span class="pill pill-blue" id="badgeCount">0 / 12</span></div>
+      <div class="badge-grid" id="badgeGrid"></div>
 
       <div class="divider"></div>
 
-      <!-- Settings -->
-      <div class="section-header">
-        <div class="section-title">Settings</div>
-      </div>
+      <div class="sh"><div class="sh-title">Settings</div></div>
+      <div id="settingsList"></div>
 
-      <div class="settings-list">
-        <div class="settings-item" onclick="showToast('Connected Apps settings')">
-          <div class="settings-left">
-            <div class="settings-icon">🔗</div>
-            <div class="settings-label">Connected Apps</div>
-          </div>
-          <div class="settings-chevron">›</div>
-        </div>
-        <div class="settings-item" onclick="showToast('Vehicle settings')">
-          <div class="settings-left">
-            <div class="settings-icon">🚘</div>
-            <div class="settings-label">Vehicle Profile</div>
-          </div>
-          <div class="settings-chevron">›</div>
-        </div>
-        <div class="settings-item" onclick="showToast('Notification preferences')">
-          <div class="settings-left">
-            <div class="settings-icon">🔔</div>
-            <div class="settings-label">Notifications</div>
-          </div>
-          <div class="settings-chevron">›</div>
-        </div>
-        <div class="settings-item" onclick="showToast('Tax preferences')">
-          <div class="settings-left">
-            <div class="settings-icon">📊</div>
-            <div class="settings-label">Tax Preferences</div>
-          </div>
-          <div class="settings-chevron">›</div>
-        </div>
-        <div class="settings-item">
-          <div class="settings-left">
-            <div class="settings-icon">🎙️</div>
-            <div class="settings-label">Voice Assistant</div>
-          </div>
-          <div class="toggle active" onclick="event.stopPropagation();this.classList.toggle('active')"></div>
-        </div>
-        <div class="settings-item">
-          <div class="settings-left">
-            <div class="settings-icon">📍</div>
-            <div class="settings-label">Auto Mileage</div>
-          </div>
-          <div class="toggle active" onclick="event.stopPropagation();this.classList.toggle('active')"></div>
-        </div>
-        <div class="settings-item" onclick="showToast('Premium features')">
-          <div class="settings-left">
-            <div class="settings-icon">👑</div>
-            <div class="settings-label">RideForge Premium</div>
-          </div>
-          <div class="settings-chevron">›</div>
-        </div>
-        <div class="settings-item" onclick="showToast('Help & Support')">
-          <div class="settings-left">
-            <div class="settings-icon">❓</div>
-            <div class="settings-label">Help & Support</div>
-          </div>
-          <div class="settings-chevron">›</div>
-        </div>
-      </div>
-
-      <div style="text-align:center;padding:20px;font-size:12px;color:var(--text-dim)">
-        RideForge v2.1.0 — Demo Mode
+      <div style="text-align:center;padding:24px;font-size:11px;color:var(--text-3)">
+        RideForge v1.0 — Demo Mode
       </div>
     </div>
 
   </div>
 
-  <!-- Voice Assistant Button -->
-  <button class="voice-btn" id="voiceBtn" onclick="toggleVoice()">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/>
-      <path d="M19 10v2a7 7 0 01-14 0v-2"/>
-      <line x1="12" y1="19" x2="12" y2="23"/>
-      <line x1="8" y1="23" x2="16" y2="23"/>
-    </svg>
+  <!-- ═══ FAB (Voice) ═══ -->
+  <button class="fab" id="fabVoice" onclick="toggleVoice()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
   </button>
 
-  <!-- Bottom Navigation -->
-  <nav class="bottom-nav">
-    <button class="nav-item active" data-tab="home" onclick="switchTab('home')">
+  <!-- ═══ BOTTOM NAV ═══ -->
+  <nav class="bnav">
+    <button class="bnav-item active" data-t="home" onclick="go('home')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
       Home
     </button>
-    <button class="nav-item" data-tab="map" onclick="switchTab('map')">
+    <button class="bnav-item" data-t="map" onclick="go('map')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1,6 1,22 8,18 16,22 23,18 23,2 16,6 8,2"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
       Map
     </button>
-    <button class="nav-item" data-tab="earnings" onclick="switchTab('earnings')">
+    <button class="bnav-item" data-t="earnings" onclick="go('earnings')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
       Earnings
     </button>
-    <button class="nav-item" data-tab="taxes" onclick="switchTab('taxes')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10,9 9,9 8,9"/></svg>
+    <button class="bnav-item" data-t="taxes" onclick="go('taxes')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
       Taxes
     </button>
-    <button class="nav-item" data-tab="profile" onclick="switchTab('profile')">
+    <button class="bnav-item" data-t="profile" onclick="go('profile')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       Profile
     </button>
   </nav>
 </div>
 
-<!-- Toast -->
-<div class="toast" id="toast"></div>
+<!-- ═══ TOAST ═══ -->
+<div class="toast" id="toast"><span class="t-icon"></span><span class="t-msg"></span></div>
+
+<!-- ═══ MODALS ═══ -->
+<div class="modal-overlay" id="addExpenseModal" onclick="if(event.target===this)closeModal(this.id)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Add Expense</div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div>
+        <div style="font-size:12px;color:var(--text-2);font-weight:600;margin-bottom:6px">MERCHANT</div>
+        <input type="text" id="expMerchant" placeholder="e.g. Shell Gas Station" style="width:100%">
+      </div>
+      <div style="display:flex;gap:10px">
+        <div style="flex:1">
+          <div style="font-size:12px;color:var(--text-2);font-weight:600;margin-bottom:6px">AMOUNT</div>
+          <input type="number" id="expAmount" placeholder="0.00" style="width:100%" step="0.01">
+        </div>
+        <div style="flex:1">
+          <div style="font-size:12px;color:var(--text-2);font-weight:600;margin-bottom:6px">CATEGORY</div>
+          <select id="expCategory" style="width:100%">
+            <option value="fuel">Fuel</option>
+            <option value="maintenance">Maintenance</option>
+            <option value="carwash">Car Wash</option>
+            <option value="parking">Parking/Tolls</option>
+            <option value="phone">Phone/Data</option>
+            <option value="insurance">Insurance</option>
+            <option value="supplies">Supplies</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:12px;color:var(--text-2);font-weight:600;margin-bottom:6px">DATE</div>
+        <input type="date" id="expDate" style="width:100%">
+      </div>
+      <div>
+        <div style="font-size:12px;color:var(--text-2);font-weight:600;margin-bottom:6px">NOTES (OPTIONAL)</div>
+        <input type="text" id="expNotes" placeholder="Any notes..." style="width:100%">
+      </div>
+      <button class="btn btn-success btn-full" onclick="addExpense()" style="margin-top:8px">
+        Save Expense
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="settingsModal" onclick="if(event.target===this)closeModal(this.id)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Settings</div>
+    <div style="display:flex;flex-direction:column;gap:4px">
+      <div class="set-row">
+        <div class="set-left"><div class="set-icon">🔗</div><div class="set-label">Connected Apps</div></div>
+        <div class="set-chevron">›</div>
+      </div>
+      <div class="set-row">
+        <div class="set-left"><div class="set-icon">🚘</div><div class="set-label">Vehicle Profile</div></div>
+        <div class="set-chevron">›</div>
+      </div>
+      <div class="set-row">
+        <div class="set-left"><div class="set-icon">🔔</div><div class="set-label">Notifications</div></div>
+        <div class="set-chevron">›</div>
+      </div>
+      <div class="set-row">
+        <div class="set-left"><div class="set-icon">📊</div><div class="set-label">Tax Preferences</div></div>
+        <div class="set-chevron">›</div>
+      </div>
+      <div class="set-row">
+        <div class="set-left"><div class="set-icon">🎙️</div><div class="set-label">Voice Assistant</div></div>
+        <div class="sw on" onclick="event.stopPropagation();this.classList.toggle('on')"></div>
+      </div>
+      <div class="set-row">
+        <div class="set-left"><div class="set-icon">📍</div><div class="set-label">Auto Mileage</div></div>
+        <div class="sw on" onclick="event.stopPropagation();this.classList.toggle('on')"></div>
+      </div>
+      <div class="set-row">
+        <div class="set-left"><div class="set-icon">🌙</div><div class="set-label">Dark Mode</div></div>
+        <div class="sw on" onclick="event.stopPropagation();this.classList.toggle('on')"></div>
+      </div>
+      <div style="margin-top:16px">
+        <button class="btn btn-outline btn-full" onclick="closeModal('settingsModal')">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script>
-(function() {
-  'use strict';
+(function(){
+'use strict';
 
-  // ─── Tab Switching ───
-  window.switchTab = function(tab) {
-    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    document.getElementById('tab-' + tab).classList.add('active');
-    document.querySelector('[data-tab="' + tab + '"]').classList.add('active');
-    document.querySelector('.content').scrollTop = 0;
+/* ════════════════════════════════════════════════
+   DATA
+   ════════════════════════════════════════════════ */
+var D = {
+  today: { gross: 187.42, net: 141.38, miles: 92.7, hours: 6.3, taxRate: 0.224, status: 'excellent' },
+  weeklyEarnings: [142, 168, 127, 195, 238, 210, 187],
+  monthlyEarnings: [3200, 3650, 4100, 3890, 4200, 4450, 4800, 4920, 5100, 4780, 5200, 5420],
+  hourlyRates: [12, 18, 22, 25, 28, 24, 32, 38, 35, 27, 20, 15],
+  hourLabels: ['6a','7a','8a','9a','10a','11a','12p','1p','2p','3p','4p','5p'],
+  cpm: [0.62, 0.58, 0.55, 0.52, 0.51, 0.49, 0.49],
+  cpmLabels: ['Jan','Feb','Mar','Apr','May','Jun','Jul'],
+  bestDays: { labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'], data: [142, 168, 127, 195, 238, 210, 187] },
 
-    if (tab === 'map') drawMap();
-    if (tab === 'earnings') { drawEarningsChart(); drawHourlyChart(); drawCostPerMileChart(); drawBestDaysChart(); }
-    if (tab === 'taxes') drawDeductionsChart();
-    if (tab === 'home') drawScoreRing();
-  };
+  platforms: [
+    { name: 'Uber', code: 'U', bg: '#000', earn: 72.50 },
+    { name: 'Lyft', code: 'L', bg: '#ea0b8c', earn: 38.20 },
+    { name: 'Uber Eats', code: 'UE', bg: '#06c167', earn: 31.47 },
+    { name: 'DoorDash', code: 'DD', bg: '#ff3008', earn: 22.15 },
+    { name: 'Instacart', code: 'IC', bg: '#0aad0a', earn: 15.60 },
+    { name: 'Spark', code: 'SP', bg: '#0071dc', earn: 7.50 },
+  ],
 
-  // ─── Toast ───
-  window.showToast = function(msg) {
-    var t = document.getElementById('toast');
-    t.textContent = msg;
-    t.classList.add('show');
-    setTimeout(function() { t.classList.remove('show'); }, 2500);
-  };
+  dispatch: [
+    { platform: 'Uber Ride', pay: 17.25, dist: 7.3, time: 18, perMi: 2.36, score: 95, v: 'accept' },
+    { platform: 'Lyft Ride', pay: 22.40, dist: 5.1, time: 14, perMi: 4.39, score: 98, v: 'accept' },
+    { platform: 'Instacart Batch', pay: 28.75, dist: 4.2, time: 45, perMi: 6.85, score: 82, v: 'accept' },
+    { platform: 'DoorDash', pay: 4.25, dist: 9.8, time: 32, perMi: 0.43, score: 12, v: 'decline' },
+    { platform: 'Grubhub', pay: 5.50, dist: 11.3, time: 38, perMi: 0.49, score: 18, v: 'decline' },
+  ],
 
-  // ─── Shift Toggle ───
-  var shiftActive = false;
-  window.toggleShift = function() {
-    shiftActive = !shiftActive;
-    var btn = document.getElementById('shiftBtn');
-    if (shiftActive) {
-      btn.className = 'shift-btn stop';
-      btn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="16" height="16" rx="2"/></svg> END SHIFT';
-      showToast('Shift started — tracking mileage');
-    } else {
-      btn.className = 'shift-btn start';
-      btn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg> START SHIFT';
-      showToast('Shift ended — 6.3 hours logged');
-    }
-  };
+  score: {
+    total: 847,
+    parts: [
+      { name: 'Profitability', val: 92, color: '#00ff88' },
+      { name: 'Strategy', val: 88, color: '#00d4ff' },
+      { name: 'Fuel Efficiency', val: 79, color: '#ffbb33' },
+      { name: 'Ratings', val: 95, color: '#00ff88' },
+      { name: 'Maintenance', val: 72, color: '#ff8844' },
+      { name: 'Safety', val: 91, color: '#00ff88' },
+      { name: 'Driving', val: 85, color: '#00d4ff' },
+    ]
+  },
 
-  // ─── Voice Toggle ───
-  var voiceActive = false;
-  window.toggleVoice = function() {
-    voiceActive = !voiceActive;
-    var btn = document.getElementById('voiceBtn');
-    if (voiceActive) {
-      btn.classList.add('listening');
-      showToast('Listening... "Show today\'s earnings"');
-      setTimeout(function() {
-        btn.classList.remove('listening');
-        voiceActive = false;
-        showToast('Today you earned $187.42 gross');
-      }, 3000);
-    }
-  };
+  deductions: [
+    { name: 'Mileage', detail: '14,230 mi × $0.67', amt: 9350, icon: '🚗', color: 'var(--blue-dim)' },
+    { name: 'Fuel', detail: 'Gas receipts', amt: 1847, icon: '⛽', color: 'var(--yellow-dim)' },
+    { name: 'Phone & Data', detail: 'Monthly plan', amt: 630, icon: '📱', color: 'var(--green-dim)' },
+    { name: 'Repairs', detail: 'Service & parts', amt: 520, icon: '🔧', color: 'var(--red-dim)' },
+    { name: 'Insurance', detail: 'Rideshare policy', amt: 310, icon: '🛡️', color: 'var(--blue-dim)' },
+    { name: 'Car Washes', detail: 'Monthly washes', amt: 96, icon: '🧽', color: 'var(--yellow-dim)' },
+    { name: 'Parking & Tolls', detail: 'Misc', amt: 94, icon: '🅿️', color: 'var(--green-dim)' },
+  ],
 
-  // ─── Chart Tab Switching ───
-  document.getElementById('earningsChartTabs').addEventListener('click', function(e) {
-    if (e.target.classList.contains('chart-tab')) {
-      this.querySelectorAll('.chart-tab').forEach(function(t) { t.classList.remove('active'); });
-      e.target.classList.add('active');
-      drawEarningsChart(e.target.dataset.period);
-    }
+  maintenance: [
+    { name: 'Oil Change', due: 'Overdue by 320 miles', icon: '🛢️', stat: 'OVERDUE', s: 'bad' },
+    { name: 'Tire Rotation', due: 'Due in 1,200 miles', icon: '🔄', stat: '1,200 mi', s: 'warn' },
+    { name: 'Brake Pads', due: '~8,000 miles remaining', icon: '🛞', stat: '8,000 mi', s: 'ok' },
+    { name: 'Battery', due: 'Replaced 6 months ago', icon: '🔋', stat: 'Good', s: 'ok' },
+    { name: 'Transmission', due: 'Next at 60,000 miles', icon: '⚙️', stat: '12,168 mi', s: 'ok' },
+    { name: 'Registration', due: 'Expires Oct 2026', icon: '📋', stat: '3 mo', s: 'warn' },
+  ],
+
+  badges: [
+    { name: 'Road Warrior', emoji: '🛣️', prog: '1,000 mi', earned: true },
+    { name: '$10K Club', emoji: '💰', prog: 'Earned', earned: true },
+    { name: 'Five Star', emoji: '⭐', prog: 'Mar 2026', earned: true },
+    { name: 'Well Oiled', emoji: '🔧', prog: '100%', earned: true },
+    { name: 'Top 10%', emoji: '📈', prog: 'Profit', earned: true },
+    { name: 'Early Bird', emoji: '🌅', prog: '50 shifts', earned: true },
+    { name: 'Smart Picker', emoji: '🎯', prog: '90% rate', earned: true },
+    { name: '$50K Club', emoji: '🏆', prog: '$38.4K/$50K', earned: false },
+    { name: 'Speed Demon', emoji: '🚀', prog: '20K mi', earned: false },
+    { name: 'Night Owl', emoji: '🌙', prog: '18/30', earned: false },
+    { name: 'Diamond', emoji: '💎', prog: 'Score 950+', earned: false },
+    { name: 'Multi-App', emoji: '🤝', prog: '4/5 apps', earned: false },
+  ],
+
+  expenses: [
+    { merchant: 'Shell Gas Station', amt: 48.32, cat: 'fuel', date: 'Today, 2:15 PM', icon: '⛽' },
+    { merchant: 'Express Car Wash', amt: 12.00, cat: 'carwash', date: 'Yesterday, 10:30 AM', icon: '🧽' },
+    { merchant: 'Airport Parking', amt: 8.00, cat: 'parking', date: 'Jul 23, 6:00 PM', icon: '🅿️' },
+    { merchant: 'AutoZone — Wiper Blades', amt: 24.99, cat: 'maintenance', date: 'Jul 20, 3:45 PM', icon: '🔧' },
+    { merchant: 'T-Mobile', amt: 89.99, cat: 'phone', date: 'Jul 15, 12:00 AM', icon: '📱' },
+  ],
+};
+
+var catIcons = { fuel:'⛽', maintenance:'🔧', carwash:'🧽', parking:'🅿️', phone:'📱', insurance:'🛡️', supplies:'📦', other:'📝' };
+
+/* ════════════════════════════════════════════════
+   STATE
+   ════════════════════════════════════════════════ */
+var S = {
+  tab: 'home',
+  shifting: false,
+  shiftStart: 0,
+  timerInterval: null,
+  voiceActive: false,
+  earnings: D.today.gross,
+  chartPeriod: 'daily',
+  rendered: {},
+};
+
+/* ════════════════════════════════════════════════
+   NAV / TABS
+   ════════════════════════════════════════════════ */
+window.go = function(tab) {
+  if (S.tab === tab) return;
+  S.tab = tab;
+  document.querySelectorAll('.panel').forEach(function(p) { p.classList.remove('active'); });
+  document.querySelectorAll('.bnav-item').forEach(function(n) { n.classList.remove('active'); });
+  document.getElementById('p-' + tab).classList.add('active');
+  document.querySelector('[data-t="' + tab + '"]').classList.add('active');
+  document.getElementById('content').scrollTop = 0;
+  renderTab(tab);
+};
+
+function renderTab(tab) {
+  if (tab === 'home' && !S.rendered.home) { renderHome(); S.rendered.home = true; }
+  if (tab === 'map') drawMap();
+  if (tab === 'earnings') { drawEarnChart(); drawHourChart(); drawCPMChart(); drawBestDays(); renderExpenses(); }
+  if (tab === 'taxes') { drawDedChart(); renderDeductions(); renderMaint(); }
+  if (tab === 'profile') { renderScoreBreakdown(); renderBadges(); renderSettings(); }
+}
+
+/* ════════════════════════════════════════════════
+   TOAST
+   ════════════════════════════════════════════════ */
+var toastTimeout;
+window.toast = function(icon, msg) {
+  clearTimeout(toastTimeout);
+  var t = document.getElementById('toast');
+  t.querySelector('.t-icon').textContent = icon;
+  t.querySelector('.t-msg').textContent = msg;
+  t.classList.add('show');
+  toastTimeout = setTimeout(function() { t.classList.remove('show'); }, 2800);
+};
+
+/* ════════════════════════════════════════════════
+   MODAL
+   ════════════════════════════════════════════════ */
+window.openModal = function(id) {
+  document.getElementById(id).classList.add('open');
+  if (id === 'addExpenseModal') {
+    document.getElementById('expDate').value = new Date().toISOString().split('T')[0];
+  }
+};
+
+window.closeModal = function(id) {
+  document.getElementById(id).classList.remove('open');
+};
+
+/* ════════════════════════════════════════════════
+   SHIFT
+   ════════════════════════════════════════════════ */
+window.toggleShift = function() {
+  S.shifting = !S.shifting;
+  var btn = document.getElementById('shiftBtn');
+  var lbl = document.getElementById('shiftLabel');
+  var tmr = document.getElementById('shiftTimer');
+
+  if (S.shifting) {
+    btn.className = 'shift-btn stop';
+    lbl.textContent = 'END SHIFT';
+    btn.querySelector('svg').innerHTML = '<rect x="4" y="4" width="16" height="16" rx="2"/>';
+    tmr.classList.add('active');
+    S.shiftStart = Date.now();
+    S.timerInterval = setInterval(updateTimer, 1000);
+    toast('🟢', 'Shift started — tracking mileage');
+  } else {
+    btn.className = 'shift-btn start';
+    lbl.textContent = 'START SHIFT';
+    btn.querySelector('svg').innerHTML = '<polygon points="5,3 19,12 5,21"/>';
+    tmr.classList.remove('active');
+    clearInterval(S.timerInterval);
+    var dur = ((Date.now() - S.shiftStart) / 3600000).toFixed(1);
+    toast('🔴', 'Shift ended — ' + dur + ' hours logged');
+  }
+};
+
+function updateTimer() {
+  var elapsed = Date.now() - S.shiftStart;
+  var h = Math.floor(elapsed / 3600000);
+  var m = Math.floor((elapsed % 3600000) / 60000);
+  var s = Math.floor((elapsed % 60000) / 1000);
+  document.getElementById('timerDisplay').textContent =
+    String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+}
+
+/* ════════════════════════════════════════════════
+   VOICE
+   ════════════════════════════════════════════════ */
+window.toggleVoice = function() {
+  var fab = document.getElementById('fabVoice');
+  if (S.voiceActive) return;
+  S.voiceActive = true;
+  fab.classList.add('listening');
+  toast('🎙️', 'Listening... "Show today\'s earnings"');
+  setTimeout(function() {
+    fab.classList.remove('listening');
+    S.voiceActive = false;
+    toast('💰', 'Today you earned $' + S.earnings.toFixed(2) + ' gross');
+  }, 3000);
+};
+
+/* ════════════════════════════════════════════════
+   ADD EXPENSE
+   ════════════════════════════════════════════════ */
+window.addExpense = function() {
+  var m = document.getElementById('expMerchant').value.trim();
+  var a = parseFloat(document.getElementById('expAmount').value);
+  var c = document.getElementById('expCategory').value;
+  var d = document.getElementById('expDate').value;
+  if (!m || isNaN(a) || a <= 0) { toast('⚠️', 'Please fill merchant and amount'); return; }
+  var dateStr = new Date(d + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  D.expenses.unshift({ merchant: m, amt: a, cat: c, date: dateStr, icon: catIcons[c] || '📝' });
+  renderExpenses();
+  closeModal('addExpenseModal');
+  document.getElementById('expMerchant').value = '';
+  document.getElementById('expAmount').value = '';
+  document.getElementById('expNotes').value = '';
+  toast('✅', 'Expense saved: $' + a.toFixed(2));
+};
+
+/* ════════════════════════════════════════════════
+   RENDERERS
+   ════════════════════════════════════════════════ */
+function renderHome() {
+  renderPlatforms();
+  renderDispatch();
+  animateMetrics();
+  drawScoreRing();
+  drawSparklines();
+}
+
+function animateMetrics() {
+  animateNum('mGross', D.today.gross, '$', 2);
+  animateNum('mNet', D.today.net, '$', 2);
+  animateNum('mMiles', D.today.miles, '', 1);
+  animateNum('mHours', D.today.hours, '', 1);
+  animateNum('mTax', Math.round(D.today.gross * D.today.taxRate), '$', 0);
+  animateNum('mRate', D.today.gross / D.today.hours, '$', 2);
+  animateNum('scoreVal', D.score.total, '', 0);
+  animateNum('weekTotal', D.weeklyEarnings.reduce(function(a,b){return a+b},0) + D.today.gross * 0.1, '$', 2);
+  animateNum('profScore', D.score.total, '', 0);
+}
+
+function animateNum(id, target, prefix, decimals) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  var start = 0;
+  var duration = 1200;
+  var startTime = null;
+
+  function step(ts) {
+    if (!startTime) startTime = ts;
+    var p = Math.min((ts - startTime) / duration, 1);
+    p = 1 - Math.pow(1 - p, 3);
+    var val = start + (target - start) * p;
+    el.textContent = prefix + (decimals > 0 ? val.toFixed(decimals) : Math.round(val));
+    if (p < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+function renderPlatforms() {
+  var html = '';
+  D.platforms.forEach(function(p) {
+    html += '<div class="plat-item" onclick="toast(\'📊\',\'' + p.name + ': $' + p.earn.toFixed(2) + ' today\')">' +
+      '<div class="p-icon" style="background:' + p.bg + '">' + p.code + '</div>' +
+      '<div><div class="plat-name">' + p.name + '</div><div class="plat-earn">$' + p.earn.toFixed(2) + '</div></div>' +
+      '</div>';
+  });
+  document.getElementById('platGrid').innerHTML = html;
+}
+
+function renderDispatch() {
+  var html = '';
+  D.dispatch.slice(0, 3).forEach(function(d, i) {
+    html += '<div class="disp ' + d.v + '" id="disp-' + i + '">' +
+      '<div class="disp-verdict">' + (d.v === 'accept' ? '✓ Accept' : '✕ Decline') + '</div>' +
+      '<div class="disp-row"><div class="disp-platform">' + d.platform + '</div><div class="disp-payout">$' + d.pay.toFixed(2) + '</div></div>' +
+      '<div class="disp-meta"><span>📍 ' + d.dist + ' mi</span><span>⏱ ' + d.time + ' min</span><span>💰 $' + d.perMi.toFixed(2) + '/mi</span></div>' +
+      '<div class="disp-score"><div class="pbar"><div class="pbar-fill" style="width:' + d.score + '%;background:' + (d.v === 'accept' ? 'var(--green)' : 'var(--red)') + '"></div></div>' +
+      '<div class="disp-score-row"><span>Profit Score</span><span class="disp-score-val">' + d.score + '/100</span></div></div>' +
+      '<div class="disp-actions">' +
+      '<button class="btn btn-success" onclick="handleDispatch(' + i + ',true)">Accept</button>' +
+      '<button class="btn btn-outline" onclick="handleDispatch(' + i + ',false)">Decline</button>' +
+      '</div></div>';
+  });
+  document.getElementById('dispatchContainer').innerHTML = html;
+}
+
+window.handleDispatch = function(idx, accepted) {
+  var el = document.getElementById('disp-' + idx);
+  if (!el) return;
+  el.style.transition = 'all 0.4s var(--ease)';
+  el.style.transform = 'translateX(' + (accepted ? '' : '-') + '120%)';
+  el.style.opacity = '0';
+  var d = D.dispatch[idx];
+  if (accepted) {
+    S.earnings += d.pay;
+    document.getElementById('mGross').textContent = '$' + S.earnings.toFixed(2);
+    document.getElementById('mNet').textContent = '$' + (S.earnings * 0.754).toFixed(2);
+    document.getElementById('mRate').textContent = '$' + (S.earnings / D.today.hours).toFixed(2);
+    toast('✅', 'Accepted ' + d.platform + ' — +$' + d.pay.toFixed(2));
+  } else {
+    toast('❌', 'Declined ' + d.platform);
+  }
+  setTimeout(function() { el.style.display = 'none'; }, 400);
+};
+
+function renderExpenses() {
+  var html = '';
+  D.expenses.forEach(function(e) {
+    html += '<div class="rcpt">' +
+      '<div class="rcpt-left"><div class="rcpt-icon">' + e.icon + '</div><div><div class="rcpt-name">' + e.merchant + '</div><div class="rcpt-date">' + e.date + '</div><div class="rcpt-cat">' + e.cat.toUpperCase() + '</div></div></div>' +
+      '<div class="rcpt-amt" style="color:var(--yellow)">-$' + e.amt.toFixed(2) + '</div></div>';
+  });
+  var el = document.getElementById('expenseList');
+  if (el) el.innerHTML = html;
+}
+
+function renderDeductions() {
+  var html = '';
+  D.deductions.forEach(function(d) {
+    html += '<div class="ded-row"><div class="ded-left"><div class="ded-icon" style="background:' + d.color + '">' + d.icon + '</div>' +
+      '<div><div class="ded-name">' + d.name + '</div><div class="ded-detail">' + d.detail + '</div></div></div>' +
+      '<div class="ded-amt">$' + d.amt.toLocaleString() + '</div></div>';
+  });
+  document.getElementById('deductionList').innerHTML = html;
+}
+
+function renderMaint() {
+  var html = '';
+  D.maintenance.forEach(function(m) {
+    html += '<div class="maint-item"><div class="maint-dot ' + m.s + '">' + m.icon + '</div>' +
+      '<div class="maint-info"><div class="maint-name">' + m.name + '</div><div class="maint-due">' + m.due + '</div></div>' +
+      '<div class="maint-stat ' + m.s + '">' + m.stat + '</div></div>';
+  });
+  document.getElementById('maintList').innerHTML = html;
+}
+
+function renderScoreBreakdown() {
+  var html = '';
+  D.score.parts.forEach(function(p) {
+    html += '<div class="sb-row"><div class="sb-lbl">' + p.name + '</div>' +
+      '<div class="sb-bar"><div class="sb-fill" style="width:' + p.val + '%;background:' + p.color + '"></div></div>' +
+      '<div class="sb-val" style="color:' + p.color + '">' + p.val + '</div></div>';
+  });
+  document.getElementById('scoreBreakdown').innerHTML = html;
+  document.getElementById('profScorePill').textContent = D.score.total + ' / 1000';
+}
+
+function renderBadges() {
+  var earned = D.badges.filter(function(b){return b.earned}).length;
+  document.getElementById('badgeCount').textContent = earned + ' / ' + D.badges.length;
+  var html = '';
+  D.badges.forEach(function(b) {
+    html += '<div class="badge ' + (b.earned ? 'earned' : 'locked') + '">' +
+      '<div class="badge-emoji">' + b.emoji + '</div>' +
+      '<div class="badge-name">' + b.name + '</div>' +
+      '<div class="badge-prog" style="color:' + (b.earned ? 'var(--green)' : 'var(--text-2)') + '">' + b.prog + '</div></div>';
+  });
+  document.getElementById('badgeGrid').innerHTML = html;
+}
+
+function renderSettings() {
+  var items = [
+    { icon: '🔗', label: 'Connected Apps' },
+    { icon: '🚘', label: 'Vehicle Profile' },
+    { icon: '🔔', label: 'Notifications' },
+    { icon: '📊', label: 'Tax Preferences' },
+    { icon: '👑', label: 'RideForge Premium' },
+    { icon: '❓', label: 'Help & Support' },
+  ];
+  var html = '';
+  items.forEach(function(it) {
+    html += '<div class="set-row" onclick="toast(\'⚙️\',\'' + it.label + ' coming soon\')"><div class="set-left"><div class="set-icon">' + it.icon + '</div><div class="set-label">' + it.label + '</div></div><div class="set-chevron">›</div></div>';
+  });
+  document.getElementById('settingsList').innerHTML = html;
+}
+
+/* ════════════════════════════════════════════════
+   CANVAS HELPERS
+   ════════════════════════════════════════════════ */
+function initCanvas(id) {
+  var c = document.getElementById(id);
+  if (!c) return null;
+  var dpr = window.devicePixelRatio || 1;
+  var r = c.parentElement.getBoundingClientRect();
+  c.width = r.width * dpr;
+  c.height = r.height * dpr;
+  c.style.width = r.width + 'px';
+  c.style.height = r.height + 'px';
+  var ctx = c.getContext('2d');
+  ctx.scale(dpr, dpr);
+  ctx.W = r.width;
+  ctx.H = r.height;
+  return ctx;
+}
+
+function drawGrid(ctx, pad, rows, maxVal) {
+  ctx.strokeStyle = '#1e2d4a';
+  ctx.lineWidth = 1;
+  ctx.fillStyle = '#556688';
+  ctx.font = '11px -apple-system,sans-serif';
+  ctx.textAlign = 'right';
+  var ch = ctx.H - pad.t - pad.b;
+  for (var i = 0; i <= rows; i++) {
+    var y = pad.t + (ch / rows) * i;
+    ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(ctx.W - pad.r, y); ctx.stroke();
+    var v = maxVal - (maxVal / rows) * i;
+    ctx.fillText('$' + Math.round(v), pad.l - 6, y + 4);
+  }
+}
+
+function drawXLabels(ctx, labels, pad, count) {
+  ctx.fillStyle = '#8899bb';
+  ctx.font = '11px -apple-system,sans-serif';
+  ctx.textAlign = 'center';
+  var cw = ctx.W - pad.l - pad.r;
+  count = count || labels.length;
+  labels.forEach(function(lbl, i) {
+    ctx.fillText(lbl, pad.l + (cw / (count - 1)) * i, ctx.H - 8);
+  });
+}
+
+function drawLine(ctx, data, pad, maxVal, color, fill) {
+  var cw = ctx.W - pad.l - pad.r;
+  var ch = ctx.H - pad.t - pad.b;
+  var pts = data.map(function(v, i) {
+    return { x: pad.l + (cw / (data.length - 1)) * i, y: pad.t + ch - (v / maxVal) * ch };
   });
 
-  // ─── Drawing Helpers ───
-  function getCtx(id, w, h) {
-    var canvas = document.getElementById(id);
-    if (!canvas) return null;
-    var dpr = window.devicePixelRatio || 1;
-    var rect = canvas.parentElement.getBoundingClientRect();
-    w = w || rect.width;
-    h = h || rect.height;
-    canvas.width = w * dpr;
-    canvas.height = h * dpr;
-    canvas.style.width = w + 'px';
-    canvas.style.height = h + 'px';
-    var ctx = canvas.getContext('2d');
-    ctx.scale(dpr, dpr);
-    ctx.W = w;
-    ctx.H = h;
-    return ctx;
+  if (fill) {
+    var g = ctx.createLinearGradient(0, pad.t, 0, ctx.H - pad.b);
+    g.addColorStop(0, color.replace(')', ',0.3)').replace('rgb', 'rgba'));
+    g.addColorStop(1, color.replace(')', ',0)').replace('rgb', 'rgba'));
+    ctx.beginPath();
+    ctx.moveTo(pts[0].x, ctx.H - pad.b);
+    pts.forEach(function(p) { ctx.lineTo(p.x, p.y); });
+    ctx.lineTo(pts[pts.length - 1].x, ctx.H - pad.b);
+    ctx.closePath();
+    ctx.fillStyle = g;
+    ctx.fill();
   }
 
-  // ─── Score Ring ───
-  window.drawScoreRing = function() {
-    var ctx = getCtx('scoreCanvas', 200, 200);
-    if (!ctx) return;
-    var cx = 100, cy = 100, r = 80, lw = 12;
-    var score = 847, max = 1000, pct = score / max;
+  ctx.beginPath();
+  pts.forEach(function(p, i) { i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y); });
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2.5;
+  ctx.lineJoin = 'round';
+  ctx.stroke();
+
+  pts.forEach(function(p) {
+    ctx.beginPath(); ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+    ctx.fillStyle = color; ctx.fill();
+    ctx.beginPath(); ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
+    ctx.fillStyle = '#0a0e17'; ctx.fill();
+  });
+}
+
+function drawBars(ctx, data, pad, maxVal, colors, labels, showVals) {
+  var cw = ctx.W - pad.l - pad.r;
+  var ch = ctx.H - pad.t - pad.b;
+  var gap = cw / data.length;
+  var bw = gap * 0.6;
+
+  data.forEach(function(v, i) {
+    var bh = (v / maxVal) * ch;
+    var x = pad.l + gap * i + (gap - bw) / 2;
+    var y = pad.t + ch - bh;
+    var c = typeof colors === 'function' ? colors(v, i) : (Array.isArray(colors) ? colors[i] : colors);
+
+    var g = ctx.createLinearGradient(x, y, x, pad.t + ch);
+    g.addColorStop(0, c);
+    g.addColorStop(1, c.replace(')', ',0.3)').replace('rgb', 'rgba'));
+    ctx.fillStyle = g;
 
     ctx.beginPath();
-    ctx.arc(cx, cy, r, 0, Math.PI * 2);
-    ctx.strokeStyle = '#1e2d4a';
-    ctx.lineWidth = lw;
-    ctx.stroke();
-
-    var start = -Math.PI / 2;
-    var end = start + Math.PI * 2 * pct;
-    var grad = ctx.createLinearGradient(0, 0, 200, 200);
-    grad.addColorStop(0, '#00d4ff');
-    grad.addColorStop(1, '#00ff88');
-    ctx.beginPath();
-    ctx.arc(cx, cy, r, start, end);
-    ctx.strokeStyle = grad;
-    ctx.lineWidth = lw;
-    ctx.lineCap = 'round';
-    ctx.stroke();
-  };
-
-  // ─── Map ───
-  window.drawMap = function() {
-    var ctx = getCtx('mapCanvas');
-    if (!ctx) return;
-    var w = ctx.W, h = ctx.H;
-
-    var bgGrad = ctx.createLinearGradient(0, 0, 0, h);
-    bgGrad.addColorStop(0, '#0d1520');
-    bgGrad.addColorStop(1, '#111d2e');
-    ctx.fillStyle = bgGrad;
-    ctx.fillRect(0, 0, w, h);
-
-    ctx.strokeStyle = '#1a2a40';
-    ctx.lineWidth = 1;
-    for (var i = 0; i < 20; i++) {
-      var x = (Math.sin(i * 0.8) * 0.5 + 0.5) * w;
-      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x + (i % 3 - 1) * 40, h); ctx.stroke();
-    }
-    for (var j = 0; j < 15; j++) {
-      var y = (Math.cos(j * 0.7) * 0.5 + 0.5) * h;
-      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y + (j % 3 - 1) * 30); ctx.stroke();
-    }
-
-    ctx.strokeStyle = '#2a3a55';
-    ctx.lineWidth = 2;
-    var roads = [
-      [[0, h * 0.3], [w * 0.3, h * 0.35], [w * 0.6, h * 0.25], [w, h * 0.3]],
-      [[0, h * 0.6], [w * 0.4, h * 0.55], [w * 0.7, h * 0.65], [w, h * 0.6]],
-      [[w * 0.2, 0], [w * 0.25, h * 0.4], [w * 0.3, h]],
-      [[w * 0.5, 0], [w * 0.55, h * 0.5], [w * 0.5, h]],
-      [[w * 0.8, 0], [w * 0.75, h * 0.3], [w * 0.8, h * 0.7], [w * 0.85, h]]
-    ];
-    roads.forEach(function(pts) {
-      ctx.beginPath();
-      ctx.moveTo(pts[0][0], pts[0][1]);
-      for (var k = 1; k < pts.length; k++) ctx.lineTo(pts[k][0], pts[k][1]);
-      ctx.stroke();
-    });
-
-    function drawZone(x, y, r, color) {
-      var g = ctx.createRadialGradient(x, y, 0, x, y, r);
-      g.addColorStop(0, color.replace(')', ',0.35)').replace('rgb', 'rgba'));
-      g.addColorStop(1, color.replace(')', ',0)').replace('rgb', 'rgba'));
-      ctx.fillStyle = g;
-      ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
-    }
-
-    drawZone(w * 0.3, h * 0.35, 50, 'rgb(255,68,102)');
-    drawZone(w * 0.55, h * 0.5, 40, 'rgb(255,68,102)');
-    drawZone(w * 0.7, h * 0.3, 35, 'rgb(255,187,51)');
-    drawZone(w * 0.2, h * 0.6, 45, 'rgb(0,255,136)');
-    drawZone(w * 0.8, h * 0.65, 30, 'rgb(170,102,255)');
-
-    function drawMarker(x, y, color, label) {
-      ctx.fillStyle = color;
-      ctx.beginPath(); ctx.arc(x, y, 6, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = 'rgba(255,255,255,0.9)';
-      ctx.beginPath(); ctx.arc(x, y, 3, 0, Math.PI * 2); ctx.fill();
-      if (label) {
-        ctx.fillStyle = 'rgba(255,255,255,0.8)';
-        ctx.font = '600 10px -apple-system,sans-serif';
-        ctx.fillText(label, x + 10, y + 4);
-      }
-    }
-
-    drawMarker(w * 0.3, h * 0.35, '#ff4466', '2.1x Surge');
-    drawMarker(w * 0.55, h * 0.5, '#ff4466', '1.8x');
-    drawMarker(w * 0.7, h * 0.3, '#ffbb33', 'Hotspot');
-    drawMarker(w * 0.2, h * 0.6, '#00ff88', 'Airport');
-    drawMarker(w * 0.8, h * 0.65, '#aa66ff', 'Concert');
-
-    ctx.fillStyle = '#00d4ff';
-    ctx.beginPath(); ctx.arc(w * 0.45, h * 0.48, 8, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = '#0a0e17';
-    ctx.beginPath(); ctx.arc(w * 0.45, h * 0.48, 4, 0, Math.PI * 2); ctx.fill();
-    ctx.strokeStyle = 'rgba(0,212,255,0.3)';
-    ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.arc(w * 0.45, h * 0.48, 16, 0, Math.PI * 2); ctx.stroke();
-  };
-
-  // ─── Earnings Chart ───
-  window.drawEarningsChart = function(period) {
-    var ctx = getCtx('earningsChart');
-    if (!ctx) return;
-    var w = ctx.W, h = ctx.H;
-    var pad = { t: 20, r: 10, b: 30, l: 50 };
-
-    var datasets = {
-      daily: { labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'], data: [142, 168, 127, 195, 238, 210, 187] },
-      weekly: { labels: ['W1','W2','W3','W4'], data: [980, 1120, 1050, 1248] },
-      monthly: { labels: ['Jan','Feb','Mar','Apr','May','Jun','Jul'], data: [4200, 4800, 5100, 4900, 5600, 5800, 5420] }
-    };
-    period = period || 'daily';
-    var d = datasets[period];
-
-    ctx.clearRect(0, 0, w, h);
-
-    var maxVal = Math.max.apply(null, d.data) * 1.15;
-    var cw = w - pad.l - pad.r, ch = h - pad.t - pad.b;
-
-    ctx.strokeStyle = '#1e2d4a';
-    ctx.lineWidth = 1;
-    for (var g = 0; g < 5; g++) {
-      var gy = pad.t + (ch / 4) * g;
-      ctx.beginPath(); ctx.moveTo(pad.l, gy); ctx.lineTo(w - pad.r, gy); ctx.stroke();
-      ctx.fillStyle = '#556688';
-      ctx.font = '11px -apple-system,sans-serif';
-      ctx.textAlign = 'right';
-      ctx.fillText('$' + Math.round(maxVal - (maxVal / 4) * g), pad.l - 6, gy + 4);
-    }
-
-    var grad = ctx.createLinearGradient(0, pad.t, 0, h - pad.b);
-    grad.addColorStop(0, 'rgba(0,255,136,0.3)');
-    grad.addColorStop(1, 'rgba(0,255,136,0)');
-
-    var points = d.data.map(function(v, i) {
-      return {
-        x: pad.l + (cw / (d.data.length - 1)) * i,
-        y: pad.t + ch - (v / maxVal) * ch
-      };
-    });
-
-    ctx.beginPath();
-    ctx.moveTo(points[0].x, h - pad.b);
-    points.forEach(function(p) { ctx.lineTo(p.x, p.y); });
-    ctx.lineTo(points[points.length - 1].x, h - pad.b);
-    ctx.closePath();
-    ctx.fillStyle = grad;
+    ctx.moveTo(x + 4, y); ctx.lineTo(x + bw - 4, y);
+    ctx.quadraticCurveTo(x + bw, y, x + bw, y + 4);
+    ctx.lineTo(x + bw, pad.t + ch); ctx.lineTo(x, pad.t + ch);
+    ctx.lineTo(x, y + 4); ctx.quadraticCurveTo(x, y, x + 4, y);
     ctx.fill();
 
-    ctx.beginPath();
-    ctx.moveTo(points[0].x, points[0].y);
-    points.forEach(function(p) { ctx.lineTo(p.x, p.y); });
-    ctx.strokeStyle = '#00ff88';
-    ctx.lineWidth = 2.5;
-    ctx.stroke();
-
-    points.forEach(function(p) {
-      ctx.beginPath(); ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
-      ctx.fillStyle = '#00ff88'; ctx.fill();
-      ctx.beginPath(); ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
-      ctx.fillStyle = '#0a0e17'; ctx.fill();
-    });
-
-    ctx.fillStyle = '#8899bb';
-    ctx.font = '11px -apple-system,sans-serif';
-    ctx.textAlign = 'center';
-    d.labels.forEach(function(lbl, i) {
-      var x = pad.l + (cw / (d.labels.length - 1)) * i;
-      ctx.fillText(lbl, x, h - 8);
-    });
-  };
-
-  // ─── Hourly Chart ───
-  window.drawHourlyChart = function() {
-    var ctx = getCtx('hourlyChart');
-    if (!ctx) return;
-    var w = ctx.W, h = ctx.H;
-    var pad = { t: 15, r: 10, b: 30, l: 50 };
-
-    var hours = ['6a','8a','10a','12p','2p','4p','6p','8p','10p'];
-    var data = [18, 22, 25, 28, 24, 32, 38, 35, 27];
-    var maxVal = 45;
-    var cw = w - pad.l - pad.r, ch = h - pad.t - pad.b;
-
-    ctx.clearRect(0, 0, w, h);
-
-    ctx.strokeStyle = '#1e2d4a';
-    ctx.lineWidth = 1;
-    for (var g = 0; g < 4; g++) {
-      var gy = pad.t + (ch / 3) * g;
-      ctx.beginPath(); ctx.moveTo(pad.l, gy); ctx.lineTo(w - pad.r, gy); ctx.stroke();
-      ctx.fillStyle = '#556688';
-      ctx.font = '11px -apple-system,sans-serif';
-      ctx.textAlign = 'right';
-      ctx.fillText('$' + Math.round(maxVal - (maxVal / 3) * g), pad.l - 6, gy + 4);
-    }
-
-    var bw = cw / data.length * 0.6;
-    var gap = cw / data.length;
-
-    data.forEach(function(v, i) {
-      var bh = (v / maxVal) * ch;
-      var x = pad.l + gap * i + (gap - bw) / 2;
-      var y = pad.t + ch - bh;
-
-      var bg = ctx.createLinearGradient(x, y, x, pad.t + ch);
-      bg.addColorStop(0, '#00d4ff');
-      bg.addColorStop(1, 'rgba(0,212,255,0.3)');
-      ctx.fillStyle = bg;
-
-      var radius = 4;
-      ctx.beginPath();
-      ctx.moveTo(x + radius, y);
-      ctx.lineTo(x + bw - radius, y);
-      ctx.quadraticCurveTo(x + bw, y, x + bw, y + radius);
-      ctx.lineTo(x + bw, pad.t + ch);
-      ctx.lineTo(x, pad.t + ch);
-      ctx.lineTo(x, y + radius);
-      ctx.quadraticCurveTo(x, y, x + radius, y);
-      ctx.fill();
-    });
-
-    ctx.fillStyle = '#8899bb';
-    ctx.font = '10px -apple-system,sans-serif';
-    ctx.textAlign = 'center';
-    hours.forEach(function(lbl, i) {
-      ctx.fillText(lbl, pad.l + gap * i + gap / 2, h - 8);
-    });
-  };
-
-  // ─── Cost Per Mile Chart ───
-  window.drawCostPerMileChart = function() {
-    var ctx = getCtx('costPerMileChart');
-    if (!ctx) return;
-    var w = ctx.W, h = ctx.H;
-    var pad = { t: 20, r: 10, b: 30, l: 50 };
-    var data = [0.62, 0.58, 0.55, 0.52, 0.51, 0.49, 0.49];
-    var labels = ['Jan','Feb','Mar','Apr','May','Jun','Jul'];
-    var maxVal = 0.7, minVal = 0.3;
-    var cw = w - pad.l - pad.r, ch = h - pad.t - pad.b;
-
-    ctx.clearRect(0, 0, w, h);
-
-    var points = data.map(function(v, i) {
-      return {
-        x: pad.l + (cw / (data.length - 1)) * i,
-        y: pad.t + ch - ((v - minVal) / (maxVal - minVal)) * ch
-      };
-    });
-
-    var grad = ctx.createLinearGradient(0, pad.t, 0, h - pad.b);
-    grad.addColorStop(0, 'rgba(0,212,255,0.25)');
-    grad.addColorStop(1, 'rgba(0,212,255,0)');
-    ctx.beginPath();
-    ctx.moveTo(points[0].x, h - pad.b);
-    points.forEach(function(p) { ctx.lineTo(p.x, p.y); });
-    ctx.lineTo(points[points.length - 1].x, h - pad.b);
-    ctx.closePath();
-    ctx.fillStyle = grad;
-    ctx.fill();
-
-    ctx.beginPath();
-    points.forEach(function(p, i) { i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y); });
-    ctx.strokeStyle = '#00d4ff';
-    ctx.lineWidth = 2.5;
-    ctx.stroke();
-
-    points.forEach(function(p) {
-      ctx.beginPath(); ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
-      ctx.fillStyle = '#00d4ff'; ctx.fill();
-    });
-
-    ctx.fillStyle = '#8899bb';
-    ctx.font = '11px -apple-system,sans-serif';
-    ctx.textAlign = 'center';
-    labels.forEach(function(lbl, i) {
-      ctx.fillText(lbl, pad.l + (cw / (labels.length - 1)) * i, h - 8);
-    });
-
-    ctx.textAlign = 'right';
-    for (var g = 0; g <= 4; g++) {
-      var val = minVal + ((maxVal - minVal) / 4) * (4 - g);
-      var gy = pad.t + (ch / 4) * g;
-      ctx.fillText('$' + val.toFixed(2), pad.l - 6, gy + 4);
-      ctx.strokeStyle = '#1e2d4a'; ctx.lineWidth = 1;
-      ctx.beginPath(); ctx.moveTo(pad.l, gy); ctx.lineTo(w - pad.r, gy); ctx.stroke();
-    }
-  };
-
-  // ─── Best Days Bar Chart ───
-  window.drawBestDaysChart = function() {
-    var ctx = getCtx('bestDaysChart');
-    if (!ctx) return;
-    var w = ctx.W, h = ctx.H;
-    var pad = { t: 10, r: 10, b: 25, l: 40 };
-    var days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-    var data = [142, 168, 127, 195, 238, 210, 187];
-    var maxVal = 260;
-    var cw = w - pad.l - pad.r, ch = h - pad.t - pad.b;
-    var bw = cw / days.length * 0.65;
-    var gap = cw / days.length;
-
-    ctx.clearRect(0, 0, w, h);
-
-    var colors = data.map(function(v) {
-      if (v >= 220) return '#00ff88';
-      if (v >= 180) return '#00d4ff';
-      if (v >= 150) return '#ffbb33';
-      return '#556688';
-    });
-
-    data.forEach(function(v, i) {
-      var bh = (v / maxVal) * ch;
-      var x = pad.l + gap * i + (gap - bw) / 2;
-      var y = pad.t + ch - bh;
-      ctx.fillStyle = colors[i];
-      ctx.beginPath();
-      ctx.moveTo(x + 3, y); ctx.lineTo(x + bw - 3, y);
-      ctx.quadraticCurveTo(x + bw, y, x + bw, y + 3);
-      ctx.lineTo(x + bw, pad.t + ch); ctx.lineTo(x, pad.t + ch);
-      ctx.lineTo(x, y + 3); ctx.quadraticCurveTo(x, y, x + 3, y);
-      ctx.fill();
-
-      ctx.fillStyle = 'rgba(255,255,255,0.8)';
+    if (showVals) {
+      ctx.fillStyle = 'rgba(255,255,255,0.85)';
       ctx.font = '600 10px -apple-system,sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText('$' + v, x + bw / 2, y - 6);
-    });
+    }
+  });
 
+  if (labels) {
     ctx.fillStyle = '#8899bb';
     ctx.font = '11px -apple-system,sans-serif';
     ctx.textAlign = 'center';
-    days.forEach(function(d, i) {
-      ctx.fillText(d, pad.l + gap * i + gap / 2, h - 6);
+    labels.forEach(function(l, i) {
+      ctx.fillText(l, pad.l + gap * i + gap / 2, ctx.H - 6);
     });
+  }
+}
+
+/* ════════════════════════════════════════════════
+   SPECIFIC CHARTS
+   ════════════════════════════════════════════════ */
+function drawScoreRing() {
+  var c = document.getElementById('scoreRing');
+  if (!c) return;
+  var dpr = window.devicePixelRatio || 1;
+  c.width = 360 * dpr; c.height = 360 * dpr;
+  c.style.width = '180px'; c.style.height = '180px';
+  var ctx = c.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  var cx = 180, cy = 180, r = 150, lw = 16;
+  var pct = D.score.total / 1000;
+
+  ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.strokeStyle = '#1e2d4a'; ctx.lineWidth = lw; ctx.stroke();
+
+  var g = ctx.createLinearGradient(0, 0, 360, 360);
+  g.addColorStop(0, '#00d4ff'); g.addColorStop(0.5, '#00ff88'); g.addColorStop(1, '#00d4ff');
+
+  var start = -Math.PI / 2;
+  var end = start + Math.PI * 2 * pct;
+  ctx.beginPath(); ctx.arc(cx, cy, r, start, end);
+  ctx.strokeStyle = g; ctx.lineWidth = lw; ctx.lineCap = 'round'; ctx.stroke();
+}
+
+function drawSparklines() {
+  drawSparkline('sparkGross', [120, 145, 132, 168, 155, 172, 187], 'rgb(0,255,136)');
+  drawSparkline('sparkNet', [90, 109, 100, 127, 117, 130, 141], 'rgb(0,212,255)');
+}
+
+function drawSparkline(id, data, color) {
+  var c = document.getElementById(id);
+  if (!c) return;
+  var dpr = window.devicePixelRatio || 1;
+  c.width = 60 * dpr; c.height = 30 * dpr;
+  var ctx = c.getContext('2d');
+  ctx.scale(dpr, dpr);
+  var w = 60, h = 30;
+  var max = Math.max.apply(null, data) * 1.1;
+  var pts = data.map(function(v, i) { return { x: (w / (data.length - 1)) * i, y: h - (v / max) * h }; });
+  ctx.beginPath();
+  pts.forEach(function(p, i) { i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y); });
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+}
+
+window.drawMap = function() {
+  var ctx = initCanvas('mapCanvas');
+  if (!ctx) return;
+  var w = ctx.W, h = ctx.H;
+
+  var bg = ctx.createLinearGradient(0, 0, 0, h);
+  bg.addColorStop(0, '#0d1520'); bg.addColorStop(1, '#111d2e');
+  ctx.fillStyle = bg; ctx.fillRect(0, 0, w, h);
+
+  ctx.strokeStyle = '#1a2a40'; ctx.lineWidth = 1;
+  for (var i = 0; i < 25; i++) {
+    var x = (Math.sin(i * 0.7 + 0.3) * 0.5 + 0.5) * w;
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x + (i % 3 - 1) * 50, h); ctx.stroke();
+  }
+  for (var j = 0; j < 18; j++) {
+    var y = (Math.cos(j * 0.6 + 0.2) * 0.5 + 0.5) * h;
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y + (j % 3 - 1) * 40); ctx.stroke();
+  }
+
+  ctx.strokeStyle = '#2a3a55'; ctx.lineWidth = 2.5;
+  [[0,h*.3,w*.3,h*.32,w*.6,h*.22,w,h*.28],[0,h*.6,w*.4,h*.55,w*.7,h*.65,w,h*.58],[w*.2,0,w*.22,h*.4,w*.28,h],[w*.5,0,w*.55,h*.5,w*.48,h],[w*.78,0,w*.75,h*.3,w*.82,h*.7,w*.85,h]].forEach(function(pts) {
+    ctx.beginPath(); ctx.moveTo(pts[0], pts[1]);
+    for (var k = 2; k < pts.length; k += 2) ctx.lineTo(pts[k], pts[k + 1]);
+    ctx.stroke();
+  });
+
+  function zone(x, y, r, col) {
+    var g = ctx.createRadialGradient(x, y, 0, x, y, r);
+    g.addColorStop(0, col + '59'); g.addColorStop(1, col + '00');
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+  }
+
+  zone(w*.3, h*.33, 55, '#ff4466');
+  zone(w*.55, h*.48, 45, '#ff4466');
+  zone(w*.7, h*.28, 38, '#ffbb33');
+  zone(w*.2, h*.6, 50, '#00ff88');
+  zone(w*.82, h*.65, 35, '#aa66ff');
+
+  function marker(x, y, col, txt) {
+    ctx.fillStyle = col;
+    ctx.beginPath(); ctx.arc(x, y, 7, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,0.9)';
+    ctx.beginPath(); ctx.arc(x, y, 3, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,0.85)';
+    ctx.font = '700 10px -apple-system,sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText(txt, x + 11, y + 4);
+  }
+
+  marker(w*.3, h*.33, '#ff4466', '2.1x Surge');
+  marker(w*.55, h*.48, '#ff4466', '1.8x');
+  marker(w*.7, h*.28, '#ffbb33', 'Hotspot');
+  marker(w*.2, h*.6, '#00ff88', 'Airport');
+  marker(w*.82, h*.65, '#aa66ff', 'Concert 8PM');
+
+  ctx.fillStyle = '#00d4ff';
+  ctx.beginPath(); ctx.arc(w*.45, h*.46, 9, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#0a0e17';
+  ctx.beginPath(); ctx.arc(w*.45, h*.46, 4, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = 'rgba(0,212,255,0.3)'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.arc(w*.45, h*.46, 18, 0, Math.PI * 2); ctx.stroke();
+};
+
+window.drawEarnChart = function(period) {
+  period = period || S.chartPeriod;
+  var ctx = initCanvas('earnChart');
+  if (!ctx) return;
+  var pad = { t: 20, r: 10, b: 30, l: 50 };
+  var sets = {
+    daily: { data: D.weeklyEarnings, labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'] },
+    weekly: { data: [980, 1120, 1050, 1248], labels: ['W1','W2','W3','W4'] },
+    monthly: { data: D.monthlyEarnings.slice(0, 7), labels: ['Jan','Feb','Mar','Apr','May','Jun','Jul'] },
   };
+  var s = sets[period];
+  var max = Math.max.apply(null, s.data) * 1.15;
+  ctx.clearRect(0, 0, ctx.W, ctx.H);
+  drawGrid(ctx, pad, 4, max);
+  drawLine(ctx, s.data, pad, max, 'rgb(0,255,136)', true);
+  drawXLabels(ctx, s.labels, pad, s.data.length);
+};
 
-  // ─── Deductions Donut Chart ───
-  window.drawDeductionsChart = function() {
-    var ctx = getCtx('deductionsChart');
-    if (!ctx) return;
-    var w = ctx.W, h = ctx.H;
-    var cx = w / 2, cy = h / 2, r = Math.min(w, h) / 2 - 20;
+window.drawHourChart = function() {
+  var ctx = initCanvas('hourChart');
+  if (!ctx) return;
+  var pad = { t: 15, r: 10, b: 28, l: 50 };
+  ctx.clearRect(0, 0, ctx.W, ctx.H);
+  drawGrid(ctx, pad, 3, 45);
+  drawBars(ctx, D.hourlyRates, pad, 45, function(v) {
+    if (v >= 30) return 'rgb(0,255,136)';
+    if (v >= 22) return 'rgb(0,212,255)';
+    return 'rgb(85,102,136)';
+  }, D.hourLabels, false);
+};
 
-    var data = [
-      { label: 'Mileage', value: 9350, color: '#00d4ff' },
-      { label: 'Fuel', value: 1847, color: '#ffbb33' },
-      { label: 'Phone', value: 630, color: '#00ff88' },
-      { label: 'Repairs', value: 520, color: '#ff4466' },
-      { label: 'Insurance', value: 310, color: '#aa66ff' },
-      { label: 'Other', value: 190, color: '#556688' }
-    ];
+window.drawCPMChart = function() {
+  var ctx = initCanvas('cpmChart');
+  if (!ctx) return;
+  var pad = { t: 15, r: 10, b: 28, l: 50 };
+  ctx.clearRect(0, 0, ctx.W, ctx.H);
 
-    var total = data.reduce(function(s, d) { return s + d.value; }, 0);
-    var start = -Math.PI / 2;
+  var max = 0.7, min = 0.3;
+  var ch = ctx.H - pad.t - pad.b, cw = ctx.W - pad.l - pad.r;
 
-    ctx.clearRect(0, 0, w, h);
+  ctx.strokeStyle = '#1e2d4a'; ctx.lineWidth = 1;
+  ctx.fillStyle = '#556688'; ctx.font = '10px -apple-system,sans-serif'; ctx.textAlign = 'right';
+  for (var i = 0; i <= 4; i++) {
+    var y = pad.t + (ch / 4) * i;
+    ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(ctx.W - pad.r, y); ctx.stroke();
+    ctx.fillText('$' + (max - (max - min) / 4 * i).toFixed(2), pad.l - 6, y + 4);
+  }
 
-    data.forEach(function(seg) {
-      var angle = (seg.value / total) * Math.PI * 2;
-      ctx.beginPath();
-      ctx.moveTo(cx, cy);
-      ctx.arc(cx, cy, r, start, start + angle);
-      ctx.closePath();
-      ctx.fillStyle = seg.color;
-      ctx.fill();
-      start += angle;
-    });
+  var pts = D.cpm.map(function(v, i) {
+    return { x: pad.l + (cw / (D.cpm.length - 1)) * i, y: pad.t + ch - ((v - min) / (max - min)) * ch };
+  });
 
-    ctx.beginPath();
-    ctx.arc(cx, cy, r * 0.6, 0, Math.PI * 2);
-    ctx.fillStyle = '#1a2235';
-    ctx.fill();
+  var g = ctx.createLinearGradient(0, pad.t, 0, ctx.H - pad.b);
+  g.addColorStop(0, 'rgba(0,212,255,0.25)'); g.addColorStop(1, 'rgba(0,212,255,0)');
+  ctx.beginPath(); ctx.moveTo(pts[0].x, ctx.H - pad.b);
+  pts.forEach(function(p) { ctx.lineTo(p.x, p.y); });
+  ctx.lineTo(pts[pts.length - 1].x, ctx.H - pad.b); ctx.closePath();
+  ctx.fillStyle = g; ctx.fill();
 
-    ctx.fillStyle = '#f0f4ff';
-    ctx.font = '700 20px -apple-system,sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('$12,847', cx, cy - 2);
-    ctx.fillStyle = '#8899bb';
-    ctx.font = '12px -apple-system,sans-serif';
-    ctx.fillText('Total Deductions', cx, cy + 16);
-  };
+  ctx.beginPath(); pts.forEach(function(p, i) { i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y); });
+  ctx.strokeStyle = '#00d4ff'; ctx.lineWidth = 2.5; ctx.stroke();
 
-  // ─── Initial Draw ───
-  drawScoreRing();
+  pts.forEach(function(p) {
+    ctx.beginPath(); ctx.arc(p.x, p.y, 4, 0, Math.PI * 2); ctx.fillStyle = '#00d4ff'; ctx.fill();
+  });
 
-  // ─── Simulate live updates ───
-  var earnings = 187.42;
-  setInterval(function() {
-    if (!shiftActive) return;
-    var add = (Math.random() * 2 + 0.5);
-    earnings += add;
-    var el = document.getElementById('grossEarnings');
-    if (el) el.textContent = '$' + earnings.toFixed(2);
-    var net = earnings * 0.754;
-    var nel = document.getElementById('netEarnings');
-    if (nel) nel.textContent = '$' + net.toFixed(2);
-    var hel = document.getElementById('hourlyRate');
-    if (hel) hel.textContent = '$' + (earnings / 6.3).toFixed(2);
-    var tel = document.getElementById('taxAside');
-    if (tel) tel.textContent = '$' + Math.round(earnings * 0.224);
-  }, 5000);
+  drawXLabels(ctx, D.cpmLabels, pad, D.cpm.length);
+};
+
+window.drawBestDays = function() {
+  var ctx = initCanvas('bestDaysChart');
+  if (!ctx) return;
+  var pad = { t: 10, r: 10, b: 25, l: 10 };
+  ctx.clearRect(0, 0, ctx.W, ctx.H);
+  drawBars(ctx, D.bestDays.data, pad, 260, function(v) {
+    if (v >= 220) return 'rgb(0,255,136)';
+    if (v >= 180) return 'rgb(0,212,255)';
+    if (v >= 150) return 'rgb(255,187,51)';
+    return 'rgb(85,102,136)';
+  }, D.bestDays.labels, true);
+};
+
+window.drawDedChart = function() {
+  var ctx = initCanvas('dedChart');
+  if (!ctx) return;
+  var w = ctx.W, h = ctx.H;
+  var cx = w / 2, cy = h / 2, r = Math.min(w, h) / 2 - 16;
+
+  var segs = [
+    { val: 9350, col: '#00d4ff' },
+    { val: 1847, col: '#ffbb33' },
+    { val: 630, col: '#00ff88' },
+    { val: 520, col: '#ff4466' },
+    { val: 310, col: '#aa66ff' },
+    { val: 190, col: '#556688' },
+  ];
+
+  var total = segs.reduce(function(s, d) { return s + d.val; }, 0);
+  var start = -Math.PI / 2;
+
+  ctx.clearRect(0, 0, w, h);
+
+  segs.forEach(function(seg) {
+    var angle = (seg.val / total) * Math.PI * 2;
+    ctx.beginPath(); ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, r, start, start + angle);
+    ctx.closePath(); ctx.fillStyle = seg.col; ctx.fill();
+    start += angle;
+  });
+
+  ctx.beginPath(); ctx.arc(cx, cy, r * 0.58, 0, Math.PI * 2);
+  ctx.fillStyle = '#1a2235'; ctx.fill();
+
+  ctx.fillStyle = '#f0f4ff'; ctx.font = '800 18px -apple-system,sans-serif';
+  ctx.textAlign = 'center'; ctx.fillText('$12,847', cx, cy - 2);
+  ctx.fillStyle = '#8899bb'; ctx.font = '12px -apple-system,sans-serif';
+  ctx.fillText('Total Deductions', cx, cy + 16);
+};
+
+/* ════════════════════════════════════════════════
+   CHART TAB SWITCHING
+   ════════════════════════════════════════════════ */
+document.getElementById('earTabs').addEventListener('click', function(e) {
+  if (!e.target.classList.contains('ctab')) return;
+  this.querySelectorAll('.ctab').forEach(function(t) { t.classList.remove('active'); });
+  e.target.classList.add('active');
+  S.chartPeriod = e.target.dataset.p;
+  drawEarnChart(S.chartPeriod);
+});
+
+/* ════════════════════════════════════════════════
+   LIVE UPDATES
+   ════════════════════════════════════════════════ */
+setInterval(function() {
+  if (!S.shifting) return;
+  var add = Math.random() * 1.5 + 0.3;
+  S.earnings += add;
+  D.today.miles += Math.random() * 0.3 + 0.05;
+  document.getElementById('mGross').textContent = '$' + S.earnings.toFixed(2);
+  document.getElementById('mNet').textContent = '$' + (S.earnings * 0.754).toFixed(2);
+  document.getElementById('mRate').textContent = '$' + (S.earnings / D.today.hours).toFixed(2);
+  document.getElementById('mTax').textContent = '$' + Math.round(S.earnings * D.today.taxRate);
+  document.getElementById('mMiles').textContent = D.today.miles.toFixed(1);
+}, 4000);
+
+/* ════════════════════════════════════════════════
+   INIT
+   ════════════════════════════════════════════════ */
+renderHome();
 
 })();
 </script>
