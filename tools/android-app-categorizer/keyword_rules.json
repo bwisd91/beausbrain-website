@@ -1,0 +1,19 @@
+{
+  "_comment": "Fallback rules used when a package isn't found in app_categories.json. Checked top-to-bottom against the package name and app label (case-insensitive substring match); first category with a match wins.",
+
+  "System & Settings": ["com.android.", "com.google.android.gms", "com.google.android.packageinstaller", "launcher", "systemui", "com.google.android.gsf", "providers.settings"],
+  "Games": ["game", "puzzle", "casino", "poker", "chess", "solitaire", "arcade", "match3", "bingo", "slots", "craft"],
+  "Finance & Banking": ["bank", "finance", "wallet", "invest", "crypto", "budget", "credit", " tax", "paypal", "venmo"],
+  "Health & Fitness": ["fitness", "health", "workout", "yoga", "meditat", "running", "sleep", " diet", "gym", "step"],
+  "Food & Delivery": ["food", "recipe", "restaurant", "delivery", "grocery", "coffee", "eat"],
+  "Travel & Navigation": ["map", "navigat", "travel", "flight", "hotel", "transit", "ride", "gps", "airline"],
+  "Shopping": ["shop", "store", "market", "deal", "coupon", "retail"],
+  "Music & Audio": ["music", "audio", "radio", "podcast", "song"],
+  "Photography & Video": ["camera", "photo", "gallery", "snapseed"],
+  "Entertainment & Streaming": ["stream", "video", " tv", "movie", "cinema", "player", "netflix", "hulu"],
+  "Social & Communication": ["chat", "messenger", "social", "sms", "mail", "meet", "dial", "contacts", "call"],
+  "News & Reading": ["news", "magazine", "kindle", "reader", "rss"],
+  "Education": ["learn", "school", "course", "edu", "language", "study", "academy"],
+  "Productivity & Office": ["office", "docs", "note", "task", "calendar", "pdf", "productivity", "drive", "cloud", "planner"],
+  "Utilities & Tools": ["tool", "util", "browser", "vpn", "security", "antivirus", "password", "scanner", "calculator", "translat", "speedtest", "clean", "battery", "backup", "file manager"]
+}
