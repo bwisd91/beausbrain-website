@@ -1,0 +1,15 @@
+# Example input for categorize_apps.py --input
+# One app per line. Either just a package name, or "Label|package.name".
+# Lines starting with # are ignored.
+
+WhatsApp|com.whatsapp
+Instagram|com.instagram.android
+Spotify|com.spotify.music
+Netflix|com.netflix.mediaclient
+Chase Mobile|com.chase.sig.android
+Google Maps|com.google.android.apps.maps
+DoorDash|com.dd.doordash
+Candy Crush|com.king.candysagasaga
+Strava|com.strava
+Google Docs|com.google.android.apps.docs.editors.docs
+My Weird Local App|com.example.myweirdlocalapp
